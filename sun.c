@@ -17,9 +17,9 @@ void sun_init(sun_t *s)
   s->specular[2] = 1.0;
   s->specular[3] = 1.0;
 
-  s->position[0] = 0.5;
-  s->position[1] = 0.9;
-  s->position[2] = -1;
+  s->position[0] = 2;
+  s->position[1] = 2;
+  s->position[2] = 1;
   s->position[3] = 1.0;
 }
 

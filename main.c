@@ -14,6 +14,10 @@ void draw_scene();
 void on_key(unsigned char k, int x, int y);
 void on_idle();
 void quit(unsigned char k, int x, int y);
+void left(unsigned char k, int x, int y);
+void right(unsigned char k, int x, int y);
+void up(unsigned char k, int x, int y);
+void down(unsigned char k, int x, int y);
 
 typedef void (*key_callback_t)(unsigned char k, int x, int y);
 
@@ -41,6 +45,17 @@ int main(int argc, char **argv)
     callbacks[i] = NULL;
 
   callbacks['q'] = &quit;
+  callbacks['s'] = &left;
+  callbacks['x'] = &right;
+  callbacks['a'] = &up;
+  callbacks['z'] = &down;
+
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_LIGHTING);
+  
+  GLfloat black[4] = { 0, 0, 0, 1 };
+  glLightModelfv(GL_LIGHT_MODEL_AMBIENT, black);
+  glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 0);
 
   sun_init(&sun);
 
@@ -52,30 +67,33 @@ int main(int argc, char **argv)
 void on_resize(int w, int h)
 {
   glViewport(0, 0, w, h);
-
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  glFrustum(-1, 1, -1, 1, 2, 1000);
 }
+
+float RY = 0.0;
+float RX = 0.0;
 
 void draw_scene()
 {
   // the sky is blue
   glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT);
-  
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glFrustum(-1, 1, -1, 1, 2, 200);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
+  
+  let_there_be_light(&sun);
+
   // take user position and translate
   // ...
 
-  let_there_be_light(&sun);
-
   // example cube
-  glTranslatef(0.0, 0.0, -2);
-  glRotatef(0, 1.0, 0.0, 45);
-  //glRotatef(1.0, 0.0, 1.0, 75);
-
+  glTranslatef(0.0, 0.0, -4);
+  glRotatef(RY, 0.0, 1.0, 0.0);
+  glRotatef(RX, 1.0, 0.0, 0.0);
+  
   GLfloat ambiente[4] = { 1.0, 0.0, 0.0, 1 };
   GLfloat direttiva[4] = { 1.0, 0.0, 0.0, 1 };
   GLfloat brillante[4] = { 0, 0, 0, 1 };
@@ -108,4 +126,24 @@ void on_idle()
 void quit(unsigned char k, int x, int y) 
 {
   exit(0);
+}
+
+void left(unsigned char k, int x, int y)
+{
+  RY -= 10;
+}
+
+void right(unsigned char k, int x, int y)
+{
+  RY += 10;
+}
+
+void up(unsigned char k, int x, int y)
+{
+  RX += 10;
+}
+
+void down(unsigned char k, int x, int y)
+{
+  RX -= 10;
 }
