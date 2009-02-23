@@ -7,6 +7,7 @@
 #include <limits.h>
 #include <GL/glut.h>
 
+#include "geometry.h"
 #include "sun.h"
 
 void on_resize(int x, int y);
@@ -80,7 +81,8 @@ void draw_scene()
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  glFrustum(-1, 1, -1, 1, 2, 200);
+  glFrustum(MIN_X, MAX_X, MIN_Y, MAX_Y, NEAR, FAR);
+
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   
