@@ -4,15 +4,23 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 #include "GL/glut.h"
 
 void on_resize(int x, int y);
 void draw_scene();
 void on_key(unsigned char k, int x, int y);
 void on_idle();
+void quit(unsigned char k, int x, int y);
+
+typedef void (*key_callback_t)(unsigned char k, int x, int y);
+
+static key_callback_t callbacks[UCHAR_MAX];
 
 int main(int argc, char **argv)
 {
+  int i;
+
   glutInit(&argc, argv);
 	
   glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
@@ -24,6 +32,11 @@ int main(int argc, char **argv)
   glutDisplayFunc(&draw_scene);
   glutKeyboardFunc(&on_key);
   glutIdleFunc(&on_idle);
+
+  for (i = 0; i < UCHAR_MAX; i++)
+    callbacks[i] = NULL;
+
+  callbacks['q'] = &quit;
 
   glutMainLoop();
 
@@ -50,9 +63,19 @@ void draw_scene()
 
 void on_key(unsigned char k, int x, int y)
 {
-  glutPostRedisplay();
+  key_callback_t f = callbacks[k];
+  if (f) 
+    {
+      (*f)(k, x, y);
+      glutPostRedisplay();
+    }
 }
 
 void on_idle() 
 {
+}
+
+void quit(unsigned char k, int x, int y) 
+{
+  exit(0);
 }
