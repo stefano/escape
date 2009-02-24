@@ -10,6 +10,7 @@
 #include "geometry.h"
 #include "field.h"
 #include "sun.h"
+#include "objects.h"
 
 void on_resize(int x, int y);
 void draw_scene();
@@ -20,6 +21,10 @@ void left(unsigned char k, int x, int y);
 void right(unsigned char k, int x, int y);
 void up(unsigned char k, int x, int y);
 void down(unsigned char k, int x, int y);
+void user_left(unsigned char k, int x, int y);
+void user_right(unsigned char k, int x, int y);
+void user_advance(unsigned char k, int x, int y);
+void user_back(unsigned char k, int x, int y);
 
 typedef void (*key_callback_t)(unsigned char k, int x, int y);
 
@@ -27,6 +32,8 @@ static key_callback_t callbacks[UCHAR_MAX];
 
 static sun_t sun;
 static field_t field;
+static flag_t flag;
+static user_t user;
 
 int main(int argc, char **argv)
 {
@@ -52,6 +59,10 @@ int main(int argc, char **argv)
   callbacks['x'] = &right;
   callbacks['a'] = &up;
   callbacks['z'] = &down;
+  callbacks['n'] = &user_left;
+  callbacks['m'] = &user_right;
+  callbacks['k'] = &user_advance;
+  callbacks['l'] = &user_back;
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_LIGHTING);
@@ -63,6 +74,8 @@ int main(int argc, char **argv)
 
   sun_init(&sun);
   field_init(&field);
+  flag_init(&flag);
+  user_init(&user);
 
   glutMainLoop();
 
@@ -90,13 +103,14 @@ void draw_scene()
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   
-  let_there_be_light(&sun);
-
-  glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-  field_draw(&field);
-
   // take user position and translate
-  // ...
+  user_move(&user);
+  // sun
+  let_there_be_light(&sun);
+  // field
+  field_draw(&field);
+  // flag
+  flag_draw(&flag);
 
   // example cube
   glTranslatef(0.0, 0.5, -4);
@@ -155,4 +169,24 @@ void up(unsigned char k, int x, int y)
 void down(unsigned char k, int x, int y)
 {
   RX -= 10;
+}
+
+void user_left(unsigned char k, int x, int y)
+{
+  user.angle += 10;
+}
+
+void user_right(unsigned char k, int x, int y)
+{
+  user.angle -= 10;
+}
+
+void user_advance(unsigned char k, int x, int y)
+{
+  user_a(&user, 1);
+}
+
+void user_back(unsigned char k, int x, int y)
+{
+  user_a(&user, -1);
 }

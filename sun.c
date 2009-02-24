@@ -32,4 +32,5 @@ void let_there_be_light(sun_t *s)
 
   glLightfv(GL_LIGHT0, GL_POSITION, s->position);
   glEnable(GL_LIGHT0);
+  glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 }
