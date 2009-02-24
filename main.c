@@ -8,6 +8,7 @@
 #include <GL/glut.h>
 
 #include "geometry.h"
+#include "field.h"
 #include "sun.h"
 
 void on_resize(int x, int y);
@@ -25,6 +26,7 @@ typedef void (*key_callback_t)(unsigned char k, int x, int y);
 static key_callback_t callbacks[UCHAR_MAX];
 
 static sun_t sun;
+static field_t field;
 
 int main(int argc, char **argv)
 {
@@ -53,12 +55,14 @@ int main(int argc, char **argv)
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_LIGHTING);
+  glEnable(GL_COLOR_MATERIAL);
   
   GLfloat black[4] = { 0, 0, 0, 1 };
   glLightModelfv(GL_LIGHT_MODEL_AMBIENT, black);
   glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 0);
 
   sun_init(&sun);
+  field_init(&field);
 
   glutMainLoop();
 
@@ -88,11 +92,14 @@ void draw_scene()
   
   let_there_be_light(&sun);
 
+  glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+  field_draw(&field);
+
   // take user position and translate
   // ...
 
   // example cube
-  glTranslatef(0.0, 0.0, -4);
+  glTranslatef(0.0, 0.5, -4);
   glRotatef(RY, 0.0, 1.0, 0.0);
   glRotatef(RX, 1.0, 0.0, 0.0);
   
@@ -101,7 +108,7 @@ void draw_scene()
   GLfloat brillante[4] = { 0, 0, 0, 1 };
     
   glMateriali(GL_FRONT, GL_SHININESS, 32);
-        
+  
   glMaterialfv(GL_FRONT, GL_AMBIENT, ambiente);
   glMaterialfv(GL_FRONT, GL_DIFFUSE, direttiva);
   glMaterialfv(GL_FRONT, GL_SPECULAR, brillante);
