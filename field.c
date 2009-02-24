@@ -2,9 +2,26 @@
 #include "geometry.h"
 
 #include <GL/glut.h>
+#include <stdio.h>
 
 void field_init(field_t *f)
 {
+  FILE *f = fopen("field.map", "r");
+  int error = 1;
+  if (f)
+    {
+      size_t res = fread(&(f->height[0][0]), sizeof(unsigned char), 
+                         FS * FS, f);
+      if (res == FS*FS) 
+        error = 0;
+    }
+  if (error)
+    {
+      int i, j;
+      for (i = 0; i < FS; i++) 
+        for (j = 0; j < FS; j++)
+          f->height[i][j] = 0;
+    }
 }
 
 void field_draw(field_t *f)
