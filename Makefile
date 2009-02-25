@@ -1,6 +1,6 @@
 INC=
 LIB=-lGL -lglut
-CC=gcc -Wall
+CC=gcc -Wall -g
 
 all: escape
 

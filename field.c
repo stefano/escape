@@ -4,6 +4,7 @@
 #include <GL/glut.h>
 #include <stdio.h>
 #include <math.h>
+#include <malloc.h>
 
 void vec_copy(float *v1, float *v2, size_t len)
 {
@@ -26,6 +27,12 @@ void find_normal(float a[], float b[], float c[], float res[])
 
 void vec_avg(float **v, size_t n, float *res)
 {
+  int i, j;
+  for (i = 0; i < n; i++)
+    for (j = 0; j < 3; j++)
+      res[j] += v[i][j];
+  for (j = 0; j < 3; j++)
+    res[j] /= n;
 }
 
 void field_init(field_t *f)
@@ -67,6 +74,7 @@ void field_init(field_t *f)
 
       }
   /* find normals */
+  float *norms = malloc(sizeof(float)*FS*FS*3);
   for (i = 0; i < FS; i++)
     for (j = 0; j < FS; j++) 
       {
@@ -81,26 +89,23 @@ void field_init(field_t *f)
         else
           v3 = f->v[i+1][j];
         find_normal(f->v[i][j], v2, v3, norm);
-        vec_copy(norm, f->normals[i][j], 3);
+        vec_copy(norm, norms+(i*FS+j), 3);
       }
   /* TODO: make normals avarage */
-}
+  for (i = 0; i < FS; i++)
+    for (j = 0; j < FS; j++) 
+      {
+        if (i == 0 || i == FS-1 || j == 0 || j == FS-1) /* border */
+          vec_copy(norms+(i*FS+j), f->normals[i][j], 3);
+        else
+          {
+            float *v[4] = { norms+(i*FS+j), norms+(i*FS+j-1), 
+                            norms+((i-1)*FS+j), norms+((i-1)*FS+j-1) };
+            vec_avg(v, 4, f->normals[i][j]);
+          }
+      }
+  free(norms);
 
-/*
- * v is a vector of vertex
- * first vertex is the one to find the normal for
- * other vertexes are his neighbours
- */
-void normal(float v[5][2], size_t n)
-{
-  int i;
-  float *self = v[0];
-  /* compute avarage */
-  for (i = 1; i < n; i++)
-    {
-      /* compute normal */
-      
-    }
 }
 
 void field_draw(field_t *f)
