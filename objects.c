@@ -8,7 +8,7 @@
 void flag_init(flag_t *f)
 {
   f->x = MIN_X + (FS/2) * MX;
-  f->z = -(NEAR + 200*MZ);
+  f->z = -(NEAR + 50*MZ);
 }
 
 void flag_draw(flag_t *f)

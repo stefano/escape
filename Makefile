@@ -19,5 +19,10 @@ field.o: field.c field.h geometry.h
 objects.o: objects.c objects.h geometry.h field.h
 	$(CC) -c objects.c $(INC)
 
+build_map: mrec
+	./map/build field.map
+mrec:
+	cd map && make 
+
 clean:
 	rm *.o escape

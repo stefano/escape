@@ -13,8 +13,20 @@ void vec_copy(float *v1, float *v2, size_t len)
     v2[i] = v1[i];
 }
 
-void find_normal(float a[], float b[], float c[], float res[])
+void find_normal(float o[], float v1[], float v2[], float res[])
 {
+  int i;
+  float a[3];
+  float b[3];
+  vec_copy(v1, a, 3);
+  vec_copy(v2, b, 3);
+
+  for (i = 0; i < 3; i++) 
+    {
+      a[i] -= o[i];
+      b[i] -= o[i];
+    }
+
   res[0] = a[1]*b[2] - a[2]*b[1];
   res[1] = a[2]*b[0] - a[0]*b[2];
   res[2] = a[0]*b[1] - a[1]*b[0];
@@ -88,15 +100,20 @@ void field_init(field_t *f)
           v3 = f->v[i-1][j];
         else
           v3 = f->v[i+1][j];
-        find_normal(f->v[i][j], v2, v3, norm);
-        vec_copy(norm, norms+(i*FS+j), 3);
+        find_normal(f->v[i][j], v3, v2, norm);
+        vec_copy(norm, norms+(i*FS+j*3), 3);
+        //        printf("%f, %f, %f\n", (norms+(i*FS+j*3))[0], (norms+(i*FS+j*3))[1], 
+        //     (norms+(i*FS+j*3))[2]);
       }
+
   /* TODO: make normals avarage */
   for (i = 0; i < FS; i++)
     for (j = 0; j < FS; j++) 
       {
+
         if (i == 0 || i == FS-1 || j == 0 || j == FS-1) /* border */
-          vec_copy(norms+(i*FS+j), f->normals[i][j], 3);
+          vec_copy(norms+(i*FS+j*3), f->normals[i][j], 3);
+          //  printf("%f, %f, %f\n", f->normals[i][j][0], f->normals[i][j][1], f->normals[i][j][2]);
         else
           {
             float *v[4] = { norms+(i*FS+j), norms+(i*FS+j-1), 
@@ -105,7 +122,6 @@ void field_init(field_t *f)
           }
       }
   free(norms);
-
 }
 
 void field_draw(field_t *f)
@@ -115,10 +131,11 @@ void field_draw(field_t *f)
   glColor3f(0.0, 1.0, 0.0);
   glBegin(GL_QUADS);
 
+  //  glNormal3f(0.0, 1.0, 0.0);
   for (i = 0; i < FS-1; i++)
     for (j = 0; j < FS-1; j++) 
       {
-        glNormal3fv(f->normals[i][j]);
+                glNormal3fv(f->normals[i][j]);
         glVertex3fv(f->v[i][j]);
         glVertex3fv(f->v[i][j+1]);
         glVertex3fv(f->v[i+1][j+1]);
@@ -134,13 +151,13 @@ void field_draw(field_t *f)
   glVertex3f(MIN_X, MAX_Y, -NEAR);
   glVertex3f(MIN_X, MAX_Y, -FAR);
   glVertex3f(MIN_X, MIN_Y, -FAR);
-
+  
   /* back */
   glVertex3f(MIN_X, MIN_Y, -FAR);
   glVertex3f(MIN_X, MAX_Y, -FAR);
   glVertex3f(MAX_X, MAX_Y, -FAR);
   glVertex3f(MAX_X, MIN_Y, -FAR);
-
+  
   /* right */
   glVertex3f(MAX_X, MIN_Y, -NEAR);
   glVertex3f(MAX_X, MAX_Y, -NEAR);
@@ -152,7 +169,7 @@ void field_draw(field_t *f)
   glVertex3f(MIN_X, MAX_Y, -NEAR);
   glVertex3f(MAX_X, MAX_Y, -NEAR);
   glVertex3f(MAX_X, MIN_Y, -NEAR);
-
+  
   glEnd();
 }
 

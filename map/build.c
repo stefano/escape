@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #define SZ 1024
-#define MAX_DIFF 3
+#define MAX_DIFF 2
 
 int main(int argc, char **argv)
 {
@@ -17,7 +17,7 @@ int main(int argc, char **argv)
   for (i = 0; i < SZ; i++)
     for (j = 0; j < SZ; j++)
       {
-        /* random generator for the moment */
+        /* random generator */
         int n = -1;
         unsigned char prev = 0;
         if (j == 0)
@@ -34,7 +34,8 @@ int main(int argc, char **argv)
         else
           {
             int sign = rand()%2;
-            if (sign == 0)
+            /* more chances to go down */
+            if (sign != 1)
               sign = -1;
             n = prev + sign*rand()%MAX_DIFF;
             if (n < 0)

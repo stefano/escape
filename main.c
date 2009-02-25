@@ -147,8 +147,8 @@ void quit(unsigned char k, int x, int y)
 
 void left(unsigned char k, int x, int y)
 {
-  sun.position[0] += 10;
-  printf("x:%f\n", sun.position[0]);
+  //  sun.position[0] += 10;
+  //printf("x:%f\n", sun.position[0]);
 }
 
 void right(unsigned char k, int x, int y)
