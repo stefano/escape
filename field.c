@@ -43,15 +43,43 @@ void field_draw(field_t *f)
   for (i = 0; i < FS-1; i++)
     for (j = 0; j < FS-1; j++) 
       {
-        glVertex3f(MIN_X + i*MX, MIN_Y + f->height[i][j], -(NEAR + j*MZ));
-        glVertex3f(MIN_X + i*MX, MIN_Y + f->height[i][j+1], 
+        glVertex3f(MIN_X + i*MX, MIN_Y + (f->height[i][j])*MY, -(NEAR + j*MZ));
+        glVertex3f(MIN_X + i*MX, MIN_Y + (f->height[i][j+1])*MY, 
                    -(NEAR + (j+1)*MZ));
-        glVertex3f(MIN_X + (i+1)*MX, MIN_Y + f->height[i+1][j+1], 
+        glVertex3f(MIN_X + (i+1)*MX, MIN_Y + (f->height[i+1][j+1])*MY, 
                    -(NEAR + (j+1)*MZ));
-        glVertex3f(MIN_X + (i+1)*MX, MIN_Y + f->height[i+1][j], 
+        glVertex3f(MIN_X + (i+1)*MX, MIN_Y + (f->height[i+1][j])*MY, 
                    -(NEAR + j*MZ));
       }
-  
+
+  /* walls */
+
+  glColor3f(0.5, 0.5, 0.5); /* gray */
+
+  /* left */
+  glVertex3f(MIN_X, MIN_Y, -NEAR);
+  glVertex3f(MIN_X, MAX_Y, -NEAR);
+  glVertex3f(MIN_X, MAX_Y, -FAR);
+  glVertex3f(MIN_X, MIN_Y, -FAR);
+
+  /* back */
+  glVertex3f(MIN_X, MIN_Y, -FAR);
+  glVertex3f(MIN_X, MAX_Y, -FAR);
+  glVertex3f(MAX_X, MAX_Y, -FAR);
+  glVertex3f(MAX_X, MIN_Y, -FAR);
+
+  /* right */
+  glVertex3f(MAX_X, MIN_Y, -NEAR);
+  glVertex3f(MAX_X, MAX_Y, -NEAR);
+  glVertex3f(MAX_X, MAX_Y, -FAR);
+  glVertex3f(MAX_X, MIN_Y, -FAR);
+
+  /* front */
+  glVertex3f(MIN_X, MIN_Y, -NEAR);
+  glVertex3f(MIN_X, MAX_Y, -NEAR);
+  glVertex3f(MAX_X, MAX_Y, -NEAR);
+  glVertex3f(MAX_X, MIN_Y, -NEAR);
+
   glEnd();
 }
 

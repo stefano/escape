@@ -90,7 +90,7 @@ void on_resize(int w, int h)
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   //glFrustum(MIN_X, MAX_X, MIN_Y, MAX_Y, NEAR, FAR);
-  gluPerspective(45, w/h, NEAR, FAR);
+  gluPerspective(30, w/h, NEAR, FAR);
 }
 
 float RY = 0.0;
