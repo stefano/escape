@@ -40,7 +40,7 @@ int main(int argc, char **argv)
   int i;
 
   glutInit(&argc, argv);
-	
+
   glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
   glutInitWindowPosition(100, 100);
   glutInitWindowSize(640, 480);
@@ -89,7 +89,7 @@ void on_resize(int w, int h)
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  //  glFrustum(MIN_X, MAX_X, MIN_Y, MAX_Y, NEAR, FAR);
+  //glFrustum(MIN_X, MAX_X, MIN_Y, MAX_Y, NEAR, FAR);
   gluPerspective(45, w/h, NEAR, FAR);
 }
 
@@ -147,12 +147,14 @@ void quit(unsigned char k, int x, int y)
 
 void left(unsigned char k, int x, int y)
 {
-  RY -= 10;
+  sun.position[0] += 10;
+  printf("x:%f\n", sun.position[0]);
 }
 
 void right(unsigned char k, int x, int y)
 {
-  RY += 10;
+  sun.position[2] -= 10;
+  printf("z:%f\n", sun.position[2]);
 }
 
 void up(unsigned char k, int x, int y)
