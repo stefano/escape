@@ -106,11 +106,10 @@ void draw_scene()
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 
-  // sun
-  let_there_be_light(&sun);
-  
   // take user position and translate
   user_move(&user);
+  // sun
+  let_there_be_light(&sun);
   // field
   field_draw(&field);
   // flag
