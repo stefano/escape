@@ -16,7 +16,7 @@ sun.o: sun.h sun.c geometry.h
 field.o: field.c field.h geometry.h
 	$(CC) -c field.c $(INC)
 
-objects.o: objects.c objects.h geometry.h
+objects.o: objects.c objects.h geometry.h field.h
 	$(CC) -c objects.c $(INC)
 
 clean:

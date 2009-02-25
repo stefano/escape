@@ -31,9 +31,9 @@ typedef void (*key_callback_t)(unsigned char k, int x, int y);
 static key_callback_t callbacks[UCHAR_MAX];
 
 static sun_t sun;
-static field_t field;
 static flag_t flag;
 static user_t user;
+field_t field;
 
 int main(int argc, char **argv)
 {
@@ -74,6 +74,7 @@ int main(int argc, char **argv)
 
   sun_init(&sun);
   field_init(&field);
+
   flag_init(&flag);
   user_init(&user);
 
@@ -85,10 +86,16 @@ int main(int argc, char **argv)
 void on_resize(int w, int h)
 {
   glViewport(0, 0, w, h);
+
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  //  glFrustum(MIN_X, MAX_X, MIN_Y, MAX_Y, NEAR, FAR);
+  gluPerspective(45, w/h, NEAR, FAR);
 }
 
 float RY = 0.0;
 float RX = 0.0;
+float Z = -4.0;
 
 void draw_scene()
 {
@@ -96,39 +103,27 @@ void draw_scene()
   glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  glFrustum(MIN_X, MAX_X, MIN_Y, MAX_Y, NEAR, FAR);
-
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
+
+  // sun
+  let_there_be_light(&sun);
   
   // take user position and translate
   user_move(&user);
-  // sun
-  let_there_be_light(&sun);
   // field
   field_draw(&field);
   // flag
   flag_draw(&flag);
 
   // example cube
-  glTranslatef(0.0, 0.5, -4);
+  /*  glTranslatef(0, 0, Z);
   glRotatef(RY, 0.0, 1.0, 0.0);
   glRotatef(RX, 1.0, 0.0, 0.0);
-  
-  GLfloat ambiente[4] = { 1.0, 0.0, 0.0, 1 };
-  GLfloat direttiva[4] = { 1.0, 0.0, 0.0, 1 };
-  GLfloat brillante[4] = { 0, 0, 0, 1 };
-    
-  glMateriali(GL_FRONT, GL_SHININESS, 32);
-  
-  glMaterialfv(GL_FRONT, GL_AMBIENT, ambiente);
-  glMaterialfv(GL_FRONT, GL_DIFFUSE, direttiva);
-  glMaterialfv(GL_FRONT, GL_SPECULAR, brillante);
-  
-  glutSolidCube(1);
 
+  glColor3f(1.0, 0.0, 0.0);
+  glutSolidCube(1);
+*/
   glutSwapBuffers();
 }
 

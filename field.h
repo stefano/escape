@@ -5,10 +5,14 @@
 
 typedef struct _field_t
 {
-  unsigned char height[FS][FS];
+  float height[FS][FS];
 } field_t;
 
 void field_init(field_t *f);
 void field_draw(field_t *f);
+/* get height at position (x,z) */
+float field_height(field_t *f, float x, float z);
+
+extern field_t field;
 
 #endif /* FIELD_H */
