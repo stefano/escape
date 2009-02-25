@@ -6,6 +6,10 @@
 typedef struct _field_t
 {
   float height[FS][FS];
+  /* pre-computed normals */
+  float normals[FS][FS][3];
+  /* pre-computed vertexes */
+  float v[FS][FS][3];
 } field_t;
 
 void field_init(field_t *f);

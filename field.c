@@ -3,12 +3,37 @@
 
 #include <GL/glut.h>
 #include <stdio.h>
+#include <math.h>
+
+void vec_copy(float *v1, float *v2, size_t len)
+{
+  int i;
+  for (i = 0; i < len; i++)
+    v2[i] = v1[i];
+}
+
+void find_normal(float a[], float b[], float c[], float res[])
+{
+  res[0] = a[1]*b[2] - a[2]*b[1];
+  res[1] = a[2]*b[0] - a[0]*b[2];
+  res[2] = a[0]*b[1] - a[1]*b[0];
+
+  float len = sqrt(res[0]*res[0]+res[1]*res[1]+res[2]*res[2]);
+  res[0] /= len;
+  res[1] /= len;
+  res[2] /= len;
+}
+
+void vec_avg(float **v, size_t n, float *res)
+{
+}
 
 void field_init(field_t *f)
 {
   FILE *map = fopen("field.map", "r");
   int error = 1;
   unsigned char bytemap[FS][FS];
+  int i,j;
 
   if (map)
     {
@@ -31,6 +56,51 @@ void field_init(field_t *f)
         for (j = 0; j < FS; j++)
           f->height[i][j] = bytemap[i][j] / 10.0; // meters 
     }
+
+  /* find vertexes */
+  for (i = 0; i < FS; i++)
+    for (j = 0; j < FS; j++) 
+      {
+        float v[3] = { MIN_X + i*MX, MIN_Y + (f->height[i][j])*MY,
+                       -(NEAR + j*MZ) };
+        vec_copy(v, f->v[i][j], 3);
+
+      }
+  /* find normals */
+  for (i = 0; i < FS; i++)
+    for (j = 0; j < FS; j++) 
+      {
+        float norm[3];
+        float *v2, *v3;
+        if (j == FS-1)
+          v2 = f->v[i][j-1];
+        else
+          v2 = f->v[i][j+1];          
+        if (i == FS-1)
+          v3 = f->v[i-1][j];
+        else
+          v3 = f->v[i+1][j];
+        find_normal(f->v[i][j], v2, v3, norm);
+        vec_copy(norm, f->normals[i][j], 3);
+      }
+  /* TODO: make normals avarage */
+}
+
+/*
+ * v is a vector of vertex
+ * first vertex is the one to find the normal for
+ * other vertexes are his neighbours
+ */
+void normal(float v[5][2], size_t n)
+{
+  int i;
+  float *self = v[0];
+  /* compute avarage */
+  for (i = 1; i < n; i++)
+    {
+      /* compute normal */
+      
+    }
 }
 
 void field_draw(field_t *f)
@@ -43,13 +113,11 @@ void field_draw(field_t *f)
   for (i = 0; i < FS-1; i++)
     for (j = 0; j < FS-1; j++) 
       {
-        glVertex3f(MIN_X + i*MX, MIN_Y + (f->height[i][j])*MY, -(NEAR + j*MZ));
-        glVertex3f(MIN_X + i*MX, MIN_Y + (f->height[i][j+1])*MY, 
-                   -(NEAR + (j+1)*MZ));
-        glVertex3f(MIN_X + (i+1)*MX, MIN_Y + (f->height[i+1][j+1])*MY, 
-                   -(NEAR + (j+1)*MZ));
-        glVertex3f(MIN_X + (i+1)*MX, MIN_Y + (f->height[i+1][j])*MY, 
-                   -(NEAR + j*MZ));
+        glNormal3fv(f->normals[i][j]);
+        glVertex3fv(f->v[i][j]);
+        glVertex3fv(f->v[i][j+1]);
+        glVertex3fv(f->v[i+1][j+1]);
+        glVertex3fv(f->v[i+1][j]);
       }
 
   /* walls */

@@ -37,6 +37,14 @@ void user_a(user_t *u, GLfloat nmeters)
   double angle = (u->angle / 180) * M_PI + M_PI/2;
   u->x += nmeters * MX * cos(angle);
   u->z += -nmeters * MZ * sin(angle);
+  if (u->x > MAX_X-MX)
+    u->x = MAX_X-MX;
+  if (u->x < MIN_X+MX)
+    u->x = MIN_X+MX;
+  if (u->z < -FAR+MZ)
+    u->z = -FAR+MZ;
+  if (u->z > -NEAR-MZ)
+    u->z = -NEAR-MZ;
 }
 
 void user_move(user_t *u)
