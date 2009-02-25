@@ -15,6 +15,7 @@
 void on_resize(int x, int y);
 void draw_scene();
 void on_key(unsigned char k, int x, int y);
+void on_key_up(unsigned char k, int x, int y);
 void on_idle();
 void quit(unsigned char k, int x, int y);
 void left(unsigned char k, int x, int y);
@@ -25,10 +26,13 @@ void user_left(unsigned char k, int x, int y);
 void user_right(unsigned char k, int x, int y);
 void user_advance(unsigned char k, int x, int y);
 void user_back(unsigned char k, int x, int y);
+void user_advance_stop(unsigned char k, int x, int y);
+void user_back_stop(unsigned char k, int x, int y);
 
 typedef void (*key_callback_t)(unsigned char k, int x, int y);
 
 static key_callback_t callbacks[UCHAR_MAX];
+static key_callback_t callbacks_up[UCHAR_MAX];
 
 static sun_t sun;
 static flag_t flag;
@@ -49,6 +53,7 @@ int main(int argc, char **argv)
   glutReshapeFunc(&on_resize);
   glutDisplayFunc(&draw_scene);
   glutKeyboardFunc(&on_key);
+  glutKeyboardUpFunc(&on_key_up);
   glutIdleFunc(&on_idle);
 
   for (i = 0; i < UCHAR_MAX; i++)
@@ -63,6 +68,9 @@ int main(int argc, char **argv)
   callbacks['m'] = &user_right;
   callbacks['k'] = &user_advance;
   callbacks['l'] = &user_back;
+
+  callbacks_up['k'] = &user_advance_stop;
+  callbacks_up['l'] = &user_back_stop;
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_LIGHTING);
@@ -136,8 +144,19 @@ void on_key(unsigned char k, int x, int y)
     }
 }
 
+void on_key_up(unsigned char k, int x, int y)
+{
+  key_callback_t f = callbacks_up[k];
+  if (f) 
+    {
+      (*f)(k, x, y);
+      glutPostRedisplay();
+    }
+}
+
 void on_idle() 
 {
+  user_update_position(&user);
 }
 
 void quit(unsigned char k, int x, int y) 
@@ -179,10 +198,25 @@ void user_right(unsigned char k, int x, int y)
 
 void user_advance(unsigned char k, int x, int y)
 {
-  user_a(&user, 1);
+  user_set_speed(&user, 5);
+  //  user_a(&user, 1);
 }
+
+void user_advance_stop(unsigned char k, int x, int y)
+{
+  user_set_speed(&user, 0);
+  //  user_a(&user, 1);
+}
+
 
 void user_back(unsigned char k, int x, int y)
 {
-  user_a(&user, -1);
+  //user_a(&user, -1);
+  user_set_speed(&user, -5);
+}
+
+void user_back_stop(unsigned char k, int x, int y)
+{
+  //user_a(&user, -1);
+  user_set_speed(&user, 0);
 }
