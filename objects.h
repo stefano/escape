@@ -12,7 +12,12 @@ typedef struct _flag_t
 void flag_init(flag_t *f);
 void flag_draw(flag_t *f);
 
-typedef struct _user_t
+struct _object_t;
+
+typedef void (*object_draw_t)(struct _object_t *u);
+typedef void (*move_strategy_t)(struct _object_t *t, double sec_delta);
+
+typedef struct _object_t
 {
   GLfloat angle;
   GLfloat x;
@@ -21,12 +26,31 @@ typedef struct _user_t
   GLfloat sx; /* current speed along the x axis */
   GLfloat sz; /* current speed along the z axis */
   size_t old_time; /* time of the last movement */
-} user_t;
 
-void user_init(user_t *u);
-/* update the user's position */
-void user_update_position(user_t *u);
-void user_set_speed(user_t *u, GLfloat speed);
-void user_move(user_t *u);
+  object_draw_t draw;
+  move_strategy_t strategy; /* how will this object move? */
+
+  /* for the sentinel strategy */
+  GLfloat origin_x;
+  GLfloat origin_z;
+  GLfloat max_dist; /* max distance from the user */
+} object_t;
+
+extern object_t user; /* main.c */
+
+void object_init(object_t *u);
+/* update the object's position */
+void object_update_position(object_t *u);
+void object_set_speed(object_t *u, GLfloat speed);
+void object_move(object_t *u);
+
+/* strategies */
+void user_strategy(object_t *u, double delta);
+/* walk around, if the user is near try to catch it */
+void sentinel_strategy(object_t *u, double delta);
+/* just go after the user */
+void follow_strategy(object_t *u, double delta);
+
+void object_init_follower(object_t *u, GLfloat x, GLfloat z, GLfloat speed);
 
 #endif /* OBJECTS_H */

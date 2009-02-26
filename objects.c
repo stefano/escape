@@ -21,48 +21,58 @@ void flag_draw(flag_t *f)
   glPopMatrix();
 }
 
-void user_init(user_t *u)
+void object_init(object_t *u)
 {
   u->angle = 0.0;
   u->x = MIN_X + (FS/2)*MX;
   u->z = -NEAR;
   u->sx = u->sz = 0.0;
   u->old_time = 0;
+  u->draw = NULL;
+  u->strategy = NULL;
 }
 
-void user_set_speed(user_t *u, GLfloat speed)
+void object_set_speed(object_t *u, GLfloat speed)
 {
+  /*
+     degree -> radians
+     0 object degress are 90 real degrees
+     TODO: make angle variations depend on speed
+  */
   double angle = (u->angle / 180) * M_PI + M_PI/2;
   u->sx = speed * cos(angle);
   u->sz = speed * sin(angle);
 }
 
-void user_update_position(user_t *u)
+void object_update_position(object_t *u)
 {
   size_t current_time = glutGet(GLUT_ELAPSED_TIME);
   size_t delta = 0;
-  double secs;
-  double angle;
-  GLfloat xmeters, zmeters;
 
   if (u->old_time != 0) /* not the first time */
     delta = current_time - u->old_time; 
   u->old_time = current_time;
 
-  secs = delta/1000.0;
-  xmeters = secs * u->sx;
-  zmeters = secs * u->sz;
+  if (u->strategy)
+    (*(u->strategy))(u, delta/1000.0);
 
-  //  printf("%f, %f,%f\n", secs, xmeters, zmeters);
+}
 
-  /*
-     degree -> radians
-     0 user degress are 90 real degrees
-     TODO: make angle variations depend on speed
-  */
-  //  angle = (u->angle / 180) * M_PI + M_PI/2;
-  //u->x += xmeters * MX * cos(angle);
-  //u->z += -zmeters * MZ * sin(angle);
+void object_move(object_t *u)
+{
+  float h = field_height(&field, u->x, u->z);
+
+  //printf("(%d,%d) h = %f\n", x, z, h);
+
+  glRotatef(-u->angle, 0.0, 1.0, 0.0);
+  glTranslatef(-u->x, - (h + 1.80) * MY, -u->z);
+}
+
+void user_strategy(object_t *u, double delta)
+{
+  GLfloat xmeters = delta * u->sx;
+  GLfloat zmeters = delta * u->sz;
+
   u->x += xmeters * MX;
   u->z += -zmeters * MZ;
 
@@ -77,12 +87,53 @@ void user_update_position(user_t *u)
     u->z = -NEAR-MZ;
 }
 
-void user_move(user_t *u)
+void sentinel_strategy(object_t *u, double delta)
 {
-  float h = field_height(&field, u->x, u->z);
+  
+}
 
-  //printf("(%d,%d) h = %f\n", x, z, h);
+void follow_strategy(object_t *u, double delta)
+{
+  /* distance vector */
+  GLfloat x = user.x - u->x;
+  GLfloat z = user.z - u->z;
+  /* normalize */
+  GLfloat len = sqrt(x*x+z*z);
+  /* don't move when on the target */
+  if (len != 0)
+    {
+      x /= len;
+      z /= len;
 
-  glRotatef(-u->angle, 0.0, 1.0, 0.0);
-  glTranslatef(-u->x, - (h + 1.80) * MY, -u->z);
+      /* sx is treated as the speed tangent to the distance vector */
+    
+      GLfloat xmeters = delta * u->sx * x;
+      GLfloat zmeters = delta * u->sx * z;
+
+      printf("%f, %f\n", xmeters, zmeters);
+
+      u->x += xmeters * MX;
+      u->z += -zmeters * MZ;
+    }
+}
+
+void draw_sphere(object_t *u)
+{
+  GLfloat r = 2;
+  glPushMatrix();
+  glColor3f(0.0, 0.0, 1.0);
+  glTranslatef(u->x, MIN_Y + r * MY + field_height(&field, u->x, u->z), u->z);
+  glScalef(r * MX, r * MY, r * MZ);
+  glutSolidSphere(1, 42, 42);
+  glPopMatrix();
+}
+
+void object_init_follower(object_t *u, GLfloat x, GLfloat z, GLfloat speed)
+{
+  object_init(u);
+  u->draw = &draw_sphere;
+  u->strategy = &follow_strategy;
+  u->x = x;
+  u->z = z;
+  u->sx = speed;
 }

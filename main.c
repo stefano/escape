@@ -36,7 +36,9 @@ static key_callback_t callbacks_up[UCHAR_MAX];
 
 static sun_t sun;
 static flag_t flag;
-static user_t user;
+object_t user;
+#define N_ENEMIES 1
+static object_t enemies[N_ENEMIES];
 field_t field;
 
 int main(int argc, char **argv)
@@ -84,7 +86,19 @@ int main(int argc, char **argv)
   field_init(&field);
 
   flag_init(&flag);
-  user_init(&user);
+  object_init(&user);
+  user.strategy = &user_strategy;
+
+  GLfloat enemy_conf[N_ENEMIES][3] = {
+    { MIN_X + 10*MX, -NEAR,  20 }
+    //    { MAX_X - 10*MX, -NEAR, 3 },
+    //{ MIN_X + (FS/2)*MX, -FAR, 7 },
+    //{ MIN_X, -FAR, 6 },
+  };
+
+  for (i = 0; i < N_ENEMIES; i++)
+    object_init_follower(&enemies[i], enemy_conf[i][0], enemy_conf[i][1],
+                         enemy_conf[i][2]);
 
   glutMainLoop();
 
@@ -107,21 +121,27 @@ float Z = -4.0;
 
 void draw_scene()
 {
+  int i;
+
   // the sky is blue
-  glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 
   // take user position and translate
-  user_move(&user);
+  object_move(&user);
   // sun
   let_there_be_light(&sun);
   // field
-  field_draw(&field);
+  //  field_draw(&field);
   // flag
   flag_draw(&flag);
+
+  for (i = 0; i < N_ENEMIES; i++)
+    if (enemies[i].draw)
+      (*(enemies[i].draw))(&enemies[i]);
 
   // example cube
   /*  glTranslatef(0, 0, Z);
@@ -156,7 +176,11 @@ void on_key_up(unsigned char k, int x, int y)
 
 void on_idle() 
 {
-  user_update_position(&user);
+  int i;
+  object_update_position(&user);
+  for (i = 0; i < N_ENEMIES; i++)
+    object_update_position(&enemies[i]);
+  glutPostRedisplay();
 }
 
 void quit(unsigned char k, int x, int y) 
@@ -198,13 +222,13 @@ void user_right(unsigned char k, int x, int y)
 
 void user_advance(unsigned char k, int x, int y)
 {
-  user_set_speed(&user, 5);
+  object_set_speed(&user, 50);
   //  user_a(&user, 1);
 }
 
 void user_advance_stop(unsigned char k, int x, int y)
 {
-  user_set_speed(&user, 0);
+  object_set_speed(&user, 0);
   //  user_a(&user, 1);
 }
 
@@ -212,11 +236,11 @@ void user_advance_stop(unsigned char k, int x, int y)
 void user_back(unsigned char k, int x, int y)
 {
   //user_a(&user, -1);
-  user_set_speed(&user, -5);
+  object_set_speed(&user, -50);
 }
 
 void user_back_stop(unsigned char k, int x, int y)
 {
   //user_a(&user, -1);
-  user_set_speed(&user, 0);
+  object_set_speed(&user, 0);
 }
