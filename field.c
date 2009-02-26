@@ -102,18 +102,15 @@ void field_init(field_t *f)
           v3 = f->v[i+1][j];
         find_normal(f->v[i][j], v3, v2, norm);
         vec_copy(norm, norms+(i*FS+j*3), 3);
-        //        printf("%f, %f, %f\n", (norms+(i*FS+j*3))[0], (norms+(i*FS+j*3))[1], 
-        //     (norms+(i*FS+j*3))[2]);
       }
 
-  /* TODO: make normals avarage */
+  /* take the avarage */
   for (i = 0; i < FS; i++)
     for (j = 0; j < FS; j++) 
       {
 
         if (i == 0 || i == FS-1 || j == 0 || j == FS-1) /* border */
           vec_copy(norms+(i*FS+j*3), f->normals[i][j], 3);
-          //  printf("%f, %f, %f\n", f->normals[i][j][0], f->normals[i][j][1], f->normals[i][j][2]);
         else
           {
             float *v[4] = { norms+(i*FS+j), norms+(i*FS+j-1), 
@@ -127,46 +124,64 @@ void field_init(field_t *f)
 void field_draw(field_t *f)
 {
   int i,j;
+
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, FIELD_TEX);
   
-  glColor3f(0.0, 1.0, 0.0);
+  glColor3f(1.0, 1.0, 1.0);
   glBegin(GL_QUADS);
 
   for (i = 0; i < FS-1; i++)
     for (j = 0; j < FS-1; j++) 
       {
         glNormal3fv(f->normals[i][j]);
+        glTexCoord2f(0, 0);
         glVertex3fv(f->v[i][j]);
         glNormal3fv(f->normals[i][j+1]);
+        glTexCoord2f(0, 1);
         glVertex3fv(f->v[i][j+1]);
         glNormal3fv(f->normals[i+1][j+1]);
+        glTexCoord2f(1, 1);
         glVertex3fv(f->v[i+1][j+1]);
         glNormal3fv(f->normals[i+1][j]);
+        glTexCoord2f(1, 0);
         glVertex3fv(f->v[i+1][j]);
       }
+  glEnd();
+  glDisable(GL_TEXTURE_2D);
 
   /* walls */
-
   glColor3f(0.5, 0.5, 0.5); /* gray */
+  //glBindTexture(GL_TEXTURE_2D, WALL_TEX);
+  glBegin(GL_QUADS);
 
   /* left */
+  glNormal3f(1, 0, 0);
+  //glTexCoord2f(0, 0);
   glVertex3f(MIN_X, MIN_Y, -NEAR);
+  //glTexCoord2f(0, MAX_Y - MIN_Y);
   glVertex3f(MIN_X, MAX_Y, -NEAR);
+  //glTexCoord2f(FAR - NEAR, MAX_Y - MIN_Y);
   glVertex3f(MIN_X, MAX_Y, -FAR);
+  //  glTexCoord2f(FAR - NEAR, 0);
   glVertex3f(MIN_X, MIN_Y, -FAR);
   
-  /* back */
+  /* front */
+  glNormal3f(0, 0, 1);
   glVertex3f(MIN_X, MIN_Y, -FAR);
   glVertex3f(MIN_X, MAX_Y, -FAR);
   glVertex3f(MAX_X, MAX_Y, -FAR);
   glVertex3f(MAX_X, MIN_Y, -FAR);
   
   /* right */
+  glNormal3f(-1, 0, 0);
   glVertex3f(MAX_X, MIN_Y, -NEAR);
   glVertex3f(MAX_X, MAX_Y, -NEAR);
   glVertex3f(MAX_X, MAX_Y, -FAR);
   glVertex3f(MAX_X, MIN_Y, -FAR);
 
-  /* front */
+  /* back */
+  glNormal3f(0, 0, -1);
   glVertex3f(MIN_X, MIN_Y, -NEAR);
   glVertex3f(MIN_X, MAX_Y, -NEAR);
   glVertex3f(MAX_X, MAX_Y, -NEAR);

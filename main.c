@@ -12,6 +12,10 @@
 #include "sun.h"
 #include "objects.h"
 
+/* textures */
+#include "textures/grass.h"
+//#include "textures/wall.h"
+
 void on_resize(int x, int y);
 void draw_scene();
 void on_key(unsigned char k, int x, int y);
@@ -68,6 +72,9 @@ int main(int argc, char **argv)
   callbacks_up['k'] = &user_stop;
   callbacks_up['l'] = &user_stop;
 
+  //glEnable(GL_CCW);
+  //  glEnable(GL_CULL_FACE);
+
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_LIGHTING);
   glEnable(GL_COLOR_MATERIAL);
@@ -76,6 +83,22 @@ int main(int argc, char **argv)
   glLightModelfv(GL_LIGHT_MODEL_AMBIENT, black);
   glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 0);
 
+  glBindTexture(GL_TEXTURE_2D, FIELD_TEX);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, gimp_image.width, gimp_image.height,
+               0, GL_RGB, GL_UNSIGNED_BYTE, gimp_image.pixel_data);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+  /*
+  glBindTexture(GL_TEXTURE_2D, WALL_TEX);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, wall_tex.width, wall_tex.height,
+               0, GL_RGB, GL_UNSIGNED_BYTE, wall_tex.pixel_data);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+*/
   sun_init(&sun);
   field_init(&field);
 
@@ -106,7 +129,7 @@ void on_resize(int w, int h)
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   //glFrustum(MIN_X, MAX_X, MIN_Y, MAX_Y, NEAR, FAR);
-  gluPerspective(30, w/h, NEAR, FAR);
+  gluPerspective(45, w/h, NEAR, FAR);
 }
 
 void draw_scene()
