@@ -5,13 +5,7 @@
 #include <math.h>
 #include <stdio.h>
 
-void flag_init(flag_t *f)
-{
-  f->x = MIN_X + (FS/2) * MX;
-  f->z = -(NEAR + 50*MZ);
-}
-
-void flag_draw(flag_t *f)
+void flag_draw(object_t *f)
 {
   glPushMatrix();
   glColor3f(1.0, 0.0, 0.0);
@@ -19,6 +13,14 @@ void flag_draw(flag_t *f)
   glScalef(2*MX, 10*MY, 2*MZ);
   glutSolidCube(1);
   glPopMatrix();
+}
+
+void flag_init(object_t *f)
+{
+  object_init(f);
+  f->x = MIN_X + (FS/2) * MX;
+  f->z = -(NEAR + 50*MZ);
+  f->draw = &flag_draw;
 }
 
 void object_init(object_t *u)
@@ -47,6 +49,15 @@ void object_set_speed(object_t *u, GLfloat speed)
   double angle = (u->angle / 180) * M_PI + M_PI/2;
   u->sx = speed * cos(angle);
   u->sz = speed * sin(angle);
+}
+
+int object_collide(object_t *u, object_t *u2)
+{
+  double dx = u->x - u2->x;
+  double dz = u->z - u2->z;
+
+  /* true when distance is lesser than 1 meter */
+  return sqrt(dx*dx+dz*dz) < 1;
 }
 
 void object_update_position(object_t *u)

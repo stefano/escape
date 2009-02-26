@@ -3,15 +3,6 @@
 
 #include <GL/glut.h>
 
-typedef struct _flag_t
-{
-  GLfloat x;
-  GLfloat z;
-} flag_t;
-
-void flag_init(flag_t *f);
-void flag_draw(flag_t *f);
-
 struct _object_t;
 
 typedef void (*object_draw_t)(struct _object_t *u);
@@ -40,11 +31,15 @@ typedef struct _object_t
 extern object_t user; /* main.c */
 
 void object_init(object_t *u);
+/* do the two objects collide? */
+int object_collide(object_t *u, object_t *u2);
 /* update the object's position */
 void object_update_position(object_t *u);
 void object_set_rot_speed(object_t *u, GLfloat speed);
 void object_set_speed(object_t *u, GLfloat speed);
 void object_move(object_t *u);
+
+void flag_init(object_t *f);
 
 /* strategies */
 void user_strategy(object_t *u, double delta);

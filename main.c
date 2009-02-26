@@ -35,7 +35,7 @@ static key_callback_t callbacks[UCHAR_MAX];
 static key_callback_t callbacks_up[UCHAR_MAX];
 
 static sun_t sun;
-static flag_t flag;
+static object_t flag;
 object_t user;
 #define N_ENEMIES 4
 static object_t enemies[N_ENEMIES];
@@ -150,7 +150,7 @@ void draw_scene()
   // field
   field_draw(&field);
   // flag
-  flag_draw(&flag);
+  (*(flag.draw))(&flag);
 
   for (i = 0; i < N_ENEMIES; i++)
     if (enemies[i].draw)
@@ -179,12 +179,51 @@ void on_key_up(unsigned char k, int x, int y)
     }
 }
 
+/* 
+ * End the game
+ */
+void end_game(int winner)
+{
+  int i;
+  /* disable (almost) all events */
+  glutIdleFunc(NULL);
+  glutKeyboardUpFunc(NULL);
+  for (i = 0; i < UCHAR_MAX; i++)
+    if (i != 'q') /* we must still be able to exit */
+      callbacks[i] = NULL;
+  if (winner)
+    {
+      /* green light */
+      sun.diffuse[0] = 0.4;
+      sun.diffuse[1] = 1.0;
+      sun.diffuse[2] = 0.4;      
+    }
+  else
+    {
+      /* red light */
+      sun.diffuse[0] = 1.0;
+      sun.diffuse[1] = 0.4;
+      sun.diffuse[2] = 0.4;
+    }
+}
+
 void on_idle() 
 {
   int i;
   object_update_position(&user);
   for (i = 0; i < N_ENEMIES; i++)
     object_update_position(&enemies[i]);
+
+  /* detect a collision */
+  if (object_collide(&user, &flag))
+    end_game(1);
+  else
+    {
+      for (i = 0; i < N_ENEMIES; i++)
+        if (object_collide(&user, &enemies[i]))
+          end_game(0);
+    }
+
   glutPostRedisplay();
 }
 
