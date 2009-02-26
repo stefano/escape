@@ -135,7 +135,7 @@ void draw_scene()
   // sun
   let_there_be_light(&sun);
   // field
-  //  field_draw(&field);
+  field_draw(&field);
   // flag
   flag_draw(&flag);
 

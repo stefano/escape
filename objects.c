@@ -110,10 +110,8 @@ void follow_strategy(object_t *u, double delta)
       GLfloat xmeters = delta * u->sx * x;
       GLfloat zmeters = delta * u->sx * z;
 
-      printf("%f, %f\n", xmeters, zmeters);
-
       u->x += xmeters * MX;
-      u->z += -zmeters * MZ;
+      u->z += zmeters * MZ;
     }
 }
 
