@@ -7,12 +7,27 @@
 
 void flag_draw(object_t *f)
 {
+  double r = 3;
   glPushMatrix();
   glColor3f(1.0, 0.0, 0.0);
   glTranslatef(f->x, MIN_Y + field_height(&field, f->x, f->z), f->z);
-  glScalef(2*MX, 10*MY, 2*MZ);
-  glutSolidCube(1);
+  glScalef(r*MX, r*MY, r*MZ);
+  glRotatef(f->angle, 0.0, 1.0, 0.0);
+  //glutSolidCube(1);
+  glBegin(GL_TRIANGLES);
+  glNormal3f(0, 0, 1);
+  glVertex2f(-0.5, 0.0);
+  glVertex2f(0.0, 1.0);
+  glVertex2f(0.5, 0.0);
+  glEnd();
   glPopMatrix();
+}
+
+void flag_rotate(object_t *f, double delta)
+{
+  f->angle += delta * 90;
+  if (f->angle > 360)
+    f->angle -= 360;
 }
 
 void flag_init(object_t *f)
@@ -21,6 +36,7 @@ void flag_init(object_t *f)
   f->x = MIN_X + (FS/2) * MX;
   f->z = -(NEAR + 50*MZ);
   f->draw = &flag_draw;
+  f->strategy = &flag_rotate;
 }
 
 void object_init(object_t *u)
@@ -53,8 +69,8 @@ void object_set_speed(object_t *u, GLfloat speed)
 
 int object_collide(object_t *u, object_t *u2)
 {
-  double dx = u->x - u2->x;
-  double dz = u->z - u2->z;
+  double dx = fabs(u->x) - fabs(u2->x);
+  double dz = fabs(u->z) - fabs(u2->z);
 
   /* true when distance is lesser than 1 meter */
   return sqrt(dx*dx+dz*dz) < 1;
@@ -83,9 +99,13 @@ void object_move(object_t *u)
 
 void user_strategy(object_t *u, double delta)
 {
-  GLfloat xmeters = delta * u->sx;
-  GLfloat zmeters = delta * u->sz;
-  GLfloat rad = delta * u->rot_speed;
+  float sx = u->sx;
+  float sz = u->sz;
+  //  field_inclination(&field, u->x, u->z, &sx, &sz);
+
+  GLfloat xmeters = delta * sx;
+  GLfloat zmeters = delta * sz;
+  GLfloat rad = delta * u->rot_speed; 
 
   u->angle += rad;
   u->x += xmeters * MX;

@@ -211,6 +211,7 @@ void on_idle()
 {
   int i;
   object_update_position(&user);
+  object_update_position(&flag);
   for (i = 0; i < N_ENEMIES; i++)
     object_update_position(&enemies[i]);
 

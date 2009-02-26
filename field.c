@@ -199,5 +199,28 @@ float field_height(field_t *f, float x, float z)
 
   if (ix >= 0 && ix < FS && iz >= 0 && iz < FS)
     return field.height[ix][iz];
+  
   return 0.0;
 }
+/*
+void field_inclination(field_t *f, float x, float z, float *sx, float *sz)
+{
+  int ix, iz, ix1, iz1;
+  
+  ix = x / MX;
+  iz = (-z) / MZ;
+  
+  //if (ix >= 0 && ix < FS && iz >= 0 && iz < FS)
+  //return field.height[ix][iz];
+
+  float hx = field.height[ix][iz];
+  float hx1 = field.height[ix+1][iz];
+
+  *sx -= (*sx) * (hx1 - hx) *  sqrt(2);
+
+  float hz = field.height[ix][iz];
+  float hz1 = field.height[ix][iz + 1];
+
+  *sz -= (*sz) * (hz1 - hz) *  sqrt(2);
+}
+*/
