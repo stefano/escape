@@ -25,6 +25,7 @@ typedef struct _object_t
   /* speeds are in m/s */
   GLfloat sx; /* current speed along the x axis */
   GLfloat sz; /* current speed along the z axis */
+  GLfloat rot_speed; /* in deg/s */
   size_t old_time; /* time of the last movement */
 
   object_draw_t draw;
@@ -41,6 +42,7 @@ extern object_t user; /* main.c */
 void object_init(object_t *u);
 /* update the object's position */
 void object_update_position(object_t *u);
+void object_set_rot_speed(object_t *u, GLfloat speed);
 void object_set_speed(object_t *u, GLfloat speed);
 void object_move(object_t *u);
 

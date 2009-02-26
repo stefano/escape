@@ -86,7 +86,7 @@ void field_init(field_t *f)
 
       }
   /* find normals */
-  float *norms = malloc(sizeof(float)*FS*FS*3);
+  float *norms = malloc(sizeof(float)*FS*FS*3); /* doesn't fit on the stack */
   for (i = 0; i < FS; i++)
     for (j = 0; j < FS; j++) 
       {
@@ -131,14 +131,16 @@ void field_draw(field_t *f)
   glColor3f(0.0, 1.0, 0.0);
   glBegin(GL_QUADS);
 
-  //  glNormal3f(0.0, 1.0, 0.0);
   for (i = 0; i < FS-1; i++)
     for (j = 0; j < FS-1; j++) 
       {
-                glNormal3fv(f->normals[i][j]);
+        glNormal3fv(f->normals[i][j]);
         glVertex3fv(f->v[i][j]);
+        glNormal3fv(f->normals[i][j+1]);
         glVertex3fv(f->v[i][j+1]);
+        glNormal3fv(f->normals[i+1][j+1]);
         glVertex3fv(f->v[i+1][j+1]);
+        glNormal3fv(f->normals[i+1][j]);
         glVertex3fv(f->v[i+1][j]);
       }
 

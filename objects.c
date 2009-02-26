@@ -26,10 +26,15 @@ void object_init(object_t *u)
   u->angle = 0.0;
   u->x = MIN_X + (FS/2)*MX;
   u->z = -NEAR;
-  u->sx = u->sz = 0.0;
+  u->sx = u->sz = u->rot_speed = 0.0;
   u->old_time = 0;
   u->draw = NULL;
   u->strategy = NULL;
+}
+
+void object_set_rot_speed(object_t *u, GLfloat speed)
+{
+  u->rot_speed = speed;
 }
 
 void object_set_speed(object_t *u, GLfloat speed)
@@ -61,9 +66,6 @@ void object_update_position(object_t *u)
 void object_move(object_t *u)
 {
   float h = field_height(&field, u->x, u->z);
-
-  //printf("(%d,%d) h = %f\n", x, z, h);
-
   glRotatef(-u->angle, 0.0, 1.0, 0.0);
   glTranslatef(-u->x, - (h + 1.80) * MY, -u->z);
 }
@@ -72,7 +74,9 @@ void user_strategy(object_t *u, double delta)
 {
   GLfloat xmeters = delta * u->sx;
   GLfloat zmeters = delta * u->sz;
+  GLfloat rad = delta * u->rot_speed;
 
+  u->angle += rad;
   u->x += xmeters * MX;
   u->z += -zmeters * MZ;
 

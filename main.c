@@ -18,16 +18,12 @@ void on_key(unsigned char k, int x, int y);
 void on_key_up(unsigned char k, int x, int y);
 void on_idle();
 void quit(unsigned char k, int x, int y);
-void left(unsigned char k, int x, int y);
-void right(unsigned char k, int x, int y);
-void up(unsigned char k, int x, int y);
-void down(unsigned char k, int x, int y);
 void user_left(unsigned char k, int x, int y);
 void user_right(unsigned char k, int x, int y);
+void user_rot_stop(unsigned char k, int x, int y);
 void user_advance(unsigned char k, int x, int y);
 void user_back(unsigned char k, int x, int y);
-void user_advance_stop(unsigned char k, int x, int y);
-void user_back_stop(unsigned char k, int x, int y);
+void user_stop(unsigned char k, int x, int y);
 
 typedef void (*key_callback_t)(unsigned char k, int x, int y);
 
@@ -37,7 +33,7 @@ static key_callback_t callbacks_up[UCHAR_MAX];
 static sun_t sun;
 static flag_t flag;
 object_t user;
-#define N_ENEMIES 1
+#define N_ENEMIES 4
 static object_t enemies[N_ENEMIES];
 field_t field;
 
@@ -62,17 +58,15 @@ int main(int argc, char **argv)
     callbacks[i] = NULL;
 
   callbacks['q'] = &quit;
-  callbacks['s'] = &left;
-  callbacks['x'] = &right;
-  callbacks['a'] = &up;
-  callbacks['z'] = &down;
   callbacks['n'] = &user_left;
   callbacks['m'] = &user_right;
   callbacks['k'] = &user_advance;
   callbacks['l'] = &user_back;
 
-  callbacks_up['k'] = &user_advance_stop;
-  callbacks_up['l'] = &user_back_stop;
+  callbacks_up['n'] = &user_rot_stop;
+  callbacks_up['m'] = &user_rot_stop;
+  callbacks_up['k'] = &user_stop;
+  callbacks_up['l'] = &user_stop;
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_LIGHTING);
@@ -90,10 +84,10 @@ int main(int argc, char **argv)
   user.strategy = &user_strategy;
 
   GLfloat enemy_conf[N_ENEMIES][3] = {
-    { MIN_X + 10*MX, -NEAR,  20 }
-    //    { MAX_X - 10*MX, -NEAR, 3 },
-    //{ MIN_X + (FS/2)*MX, -FAR, 7 },
-    //{ MIN_X, -FAR, 6 },
+    { MIN_X + 10*MX, -NEAR,  20 },
+    { MAX_X - 10*MX, -NEAR, 30 },
+    { MIN_X + (FS/2)*MX, -FAR, 15 },
+    { MIN_X, -FAR, 18 }
   };
 
   for (i = 0; i < N_ENEMIES; i++)
@@ -115,16 +109,12 @@ void on_resize(int w, int h)
   gluPerspective(30, w/h, NEAR, FAR);
 }
 
-float RY = 0.0;
-float RX = 0.0;
-float Z = -4.0;
-
 void draw_scene()
 {
   int i;
 
-  // the sky is blue
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  /* the sky is blue */
+  glClearColor(0.0f, 0.0f, 0.6f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glMatrixMode(GL_MODELVIEW);
@@ -143,14 +133,6 @@ void draw_scene()
     if (enemies[i].draw)
       (*(enemies[i].draw))(&enemies[i]);
 
-  // example cube
-  /*  glTranslatef(0, 0, Z);
-  glRotatef(RY, 0.0, 1.0, 0.0);
-  glRotatef(RX, 1.0, 0.0, 0.0);
-
-  glColor3f(1.0, 0.0, 0.0);
-  glutSolidCube(1);
-*/
   glutSwapBuffers();
 }
 
@@ -188,59 +170,32 @@ void quit(unsigned char k, int x, int y)
   exit(0);
 }
 
-void left(unsigned char k, int x, int y)
-{
-  //  sun.position[0] += 10;
-  //printf("x:%f\n", sun.position[0]);
-}
-
-void right(unsigned char k, int x, int y)
-{
-  sun.position[2] -= 10;
-  printf("z:%f\n", sun.position[2]);
-}
-
-void up(unsigned char k, int x, int y)
-{
-  RX += 10;
-}
-
-void down(unsigned char k, int x, int y)
-{
-  RX -= 10;
-}
-
 void user_left(unsigned char k, int x, int y)
 {
-  user.angle += 10;
+  object_set_rot_speed(&user, 60);
 }
 
 void user_right(unsigned char k, int x, int y)
 {
-  user.angle -= 10;
+  object_set_rot_speed(&user, -60);
+}
+
+void user_rot_stop(unsigned char k, int x, int y)
+{
+  object_set_rot_speed(&user, 0);
 }
 
 void user_advance(unsigned char k, int x, int y)
 {
   object_set_speed(&user, 50);
-  //  user_a(&user, 1);
 }
-
-void user_advance_stop(unsigned char k, int x, int y)
-{
-  object_set_speed(&user, 0);
-  //  user_a(&user, 1);
-}
-
 
 void user_back(unsigned char k, int x, int y)
 {
-  //user_a(&user, -1);
   object_set_speed(&user, -50);
 }
 
-void user_back_stop(unsigned char k, int x, int y)
+void user_stop(unsigned char k, int x, int y)
 {
-  //user_a(&user, -1);
   object_set_speed(&user, 0);
 }
