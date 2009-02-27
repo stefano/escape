@@ -152,41 +152,30 @@ void field_draw(field_t *f)
 
   /* walls */
   glColor3f(0.5, 0.5, 0.5); /* gray */
-  //glBindTexture(GL_TEXTURE_2D, WALL_TEX);
-  glBegin(GL_QUADS);
+  glBegin(GL_QUAD_STRIP);
 
   /* left */
   glNormal3f(1, 0, 0);
-  //glTexCoord2f(0, 0);
   glVertex3f(MIN_X, MIN_Y, -NEAR);
-  //glTexCoord2f(0, MAX_Y - MIN_Y);
   glVertex3f(MIN_X, MAX_Y, -NEAR);
-  //glTexCoord2f(FAR - NEAR, MAX_Y - MIN_Y);
-  glVertex3f(MIN_X, MAX_Y, -FAR);
-  //  glTexCoord2f(FAR - NEAR, 0);
   glVertex3f(MIN_X, MIN_Y, -FAR);
+  glVertex3f(MIN_X, MAX_Y, -FAR);
   
   /* front */
   glNormal3f(0, 0, 1);
-  glVertex3f(MIN_X, MIN_Y, -FAR);
-  glVertex3f(MIN_X, MAX_Y, -FAR);
-  glVertex3f(MAX_X, MAX_Y, -FAR);
   glVertex3f(MAX_X, MIN_Y, -FAR);
+  glVertex3f(MAX_X, MAX_Y, -FAR);
   
   /* right */
   glNormal3f(-1, 0, 0);
   glVertex3f(MAX_X, MIN_Y, -NEAR);
   glVertex3f(MAX_X, MAX_Y, -NEAR);
-  glVertex3f(MAX_X, MAX_Y, -FAR);
-  glVertex3f(MAX_X, MIN_Y, -FAR);
 
   /* back */
   glNormal3f(0, 0, -1);
   glVertex3f(MIN_X, MIN_Y, -NEAR);
   glVertex3f(MIN_X, MAX_Y, -NEAR);
-  glVertex3f(MAX_X, MAX_Y, -NEAR);
-  glVertex3f(MAX_X, MIN_Y, -NEAR);
-  
+ 
   glEnd();
 }
 
