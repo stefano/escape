@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <string.h>
 #include <GL/glut.h>
 
 #include "geometry.h"
@@ -16,6 +17,13 @@
 #include "textures/grass.h"
 //#include "textures/wall.h"
 
+#define USER_SPEED 10
+
+/* messages */
+/*const char *winner = "You Won!";
+const char *looser = "Game Over!";
+char *msg = NULL;
+*/
 void on_resize(int x, int y);
 void draw_scene();
 void on_key(unsigned char k, int x, int y);
@@ -110,10 +118,10 @@ int main(int argc, char **argv)
   user.strategy = &user_strategy;
 
   GLfloat enemy_conf[N_ENEMIES][3] = {
-    { MIN_X + 10*MX, -NEAR,  20 },
-    { MAX_X - 10*MX, -NEAR, 30 },
-    { MIN_X + (FS/2)*MX, -FAR, 15 },
-    { MIN_X, -FAR, 18 }
+    { MIN_X + 10*MX, -NEAR,  7 },
+    { MAX_X - 10*MX, -NEAR, 6 },
+    { MIN_X + (FS/2)*MX, -FAR, 5 },
+    { MIN_X, -FAR, 5 }
   };
 
   for (i = 0; i < N_ENEMIES; i++)
@@ -127,6 +135,9 @@ int main(int argc, char **argv)
 
 void on_resize(int w, int h)
 {
+  if (h == 0)
+    h = 1; /* avoid division by 0 */
+
   glViewport(0, 0, w, h);
 
   glMatrixMode(GL_PROJECTION);
@@ -158,7 +169,17 @@ void draw_scene()
   for (i = 0; i < N_ENEMIES; i++)
     if (enemies[i].draw)
       (*(enemies[i].draw))(&enemies[i]);
-  
+
+  /*  if (msg)
+    {
+      int i;
+      glPushMatrix();
+      glTranslatef(MIN_X + (FS/2) * MX, 0.0, 0.0);
+      for (i = 0; i<strlen(winner); i++)
+        glutStrokeCharacter(GLUT_STROKE_ROMAN, winner[i]);
+      glPopMatrix();
+    }
+  */
   glutSwapBuffers();
 }
 
@@ -199,7 +220,9 @@ void end_game(int winner)
       /* green light */
       sun.diffuse[0] = 0.4;
       sun.diffuse[1] = 1.0;
-      sun.diffuse[2] = 0.4;      
+      sun.diffuse[2] = 0.4;
+
+      //msg = winner;
     }
   else
     {
@@ -207,6 +230,8 @@ void end_game(int winner)
       sun.diffuse[0] = 1.0;
       sun.diffuse[1] = 0.4;
       sun.diffuse[2] = 0.4;
+
+      //      msg = looser;
     }
 }
 
@@ -255,12 +280,12 @@ void user_rot_stop(unsigned char k, int x, int y)
 
 void user_advance(unsigned char k, int x, int y)
 {
-  object_set_speed(&user, 50);
+  object_set_speed(&user, USER_SPEED);
 }
 
 void user_back(unsigned char k, int x, int y)
 {
-  object_set_speed(&user, -50);
+  object_set_speed(&user, -USER_SPEED);
 }
 
 void user_stop(unsigned char k, int x, int y)

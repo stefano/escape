@@ -3,6 +3,7 @@
 #include "field.h"
 
 #include <math.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 void flag_draw(object_t *f)
@@ -39,9 +40,22 @@ void flag_rotate(object_t *f, double delta)
 
 void flag_init(object_t *f)
 {
+  srand(glutGet(GLUT_ELAPSED_TIME));
+
   object_init(f);
-  f->x = MIN_X + (FS/2) * MX;
-  f->z = -(NEAR + 50*MZ);
+
+  if (rand()%2 == 0) /* left */
+    f->x = MIN_X + rand()%(int)((FS/2)*MX - 200);
+  else /* right */
+    f->x = MIN_X + (FS/2)*MX + 200 + rand()%(int)((FS/2)*MX - 200);
+  f->z = - (NEAR + 200 + rand()%(int)(FAR-NEAR-200));
+  
+
+  //  f->x = MIN_X + cos(angle) * dist;//(FS/2) * MX;
+  //f->z = -(NEAR + sin(angle) * dist);//50*MZ);
+
+  printf("%f, %f\n", f->x, f->z);
+
   f->draw = &flag_draw;
   f->strategy = &flag_rotate;
 }
