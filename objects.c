@@ -27,6 +27,7 @@ void flag_draw(object_t *f)
   glEnd();
   glColor4f(0.0, 1.0, 0.0, 0.6);
   glutSolidSphere(1, 42, 42);
+  glPopMatrix();
 }
 
 void flag_rotate(object_t *f, double delta)
