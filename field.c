@@ -196,12 +196,28 @@ float field_height(field_t *f, float x, float z)
 
   ix = x / MX;
   iz = (-z) / MZ;
-
+  /*
+  if (ix == x && iz == -z)
+    {
+      printf("%f\n", field.height[ix][iz]);
+      return field.height[ix][iz];
+    }
+  */
   if (ix >= 0 && ix < FS && iz >= 0 && iz < FS)
-    return field.height[ix][iz];
-  
+    return field.height[ix][iz]; 
+  /*  
+  float *p1 = f->v[ix][iz];//{ ix, iz, field.height[ix][iz] };
+  float *p2 = f->v[ix+1][iz];//{ ix + 1, iz, field.height[ix+1][iz] };
+  float *p3 = f->v[ix][iz+1];//{ ix, iz + 1, field.height[ix][iz+1] };
+  float n[3];
+  //  printf("%f %f %f\n", p3[0], p3[1], p3[2]);
+  find_normal(p1, p2, p3, n);
+  float h = (-n[0]*(x-p1[0]) - n[3]*(z - p1[2]) + n[2]*p1[1]) / n[1];
+  printf("%f %f %f => %f\n", n[0], n[1], n[2], h);
+  return -h;*/
   return 0.0;
 }
+
 /*
 void field_inclination(field_t *f, float x, float z, float *sx, float *sz)
 {

@@ -7,20 +7,26 @@
 
 void flag_draw(object_t *f)
 {
+  // rotating triangle within a sphere
   double r = 3;
+  double h = MIN_Y + field_height(&field, f->x, f->z) + MY; // floating
   glPushMatrix();
   glColor3f(1.0, 0.0, 0.0);
-  glTranslatef(f->x, MIN_Y + field_height(&field, f->x, f->z), f->z);
+  glTranslatef(f->x, h, f->z);
   glScalef(r*MX, r*MY, r*MZ);
   glRotatef(f->angle, 0.0, 1.0, 0.0);
-  //glutSolidCube(1);
   glBegin(GL_TRIANGLES);
   glNormal3f(0, 0, 1);
   glVertex2f(-0.5, 0.0);
   glVertex2f(0.0, 1.0);
   glVertex2f(0.5, 0.0);
+  glNormal3f(0, 0, -1);
+  glVertex2f(0.5, 0.0);
+  glVertex2f(0.0, 1.0); 
+  glVertex2f(-0.5, 0.0);
   glEnd();
-  glPopMatrix();
+  glColor4f(0.0, 1.0, 0.0, 0.6);
+  glutSolidSphere(1, 42, 42);
 }
 
 void flag_rotate(object_t *f, double delta)
@@ -59,8 +65,7 @@ void object_set_speed(object_t *u, GLfloat speed)
 {
   /*
      degree -> radians
-     0 object degress are 90 real degrees
-     TODO: make angle variations depend on speed
+     0 object degrees are 90 real degrees
   */
   double angle = (u->angle / 180) * M_PI + M_PI/2;
   u->sx = speed * cos(angle);
@@ -101,7 +106,7 @@ void user_strategy(object_t *u, double delta)
 {
   float sx = u->sx;
   float sz = u->sz;
-  //  field_inclination(&field, u->x, u->z, &sx, &sz);
+ //  field_inclination(&field, u->x, u->z, &sx, &sz);
 
   GLfloat xmeters = delta * sx;
   GLfloat zmeters = delta * sz;

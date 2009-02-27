@@ -72,8 +72,11 @@ int main(int argc, char **argv)
   callbacks_up['k'] = &user_stop;
   callbacks_up['l'] = &user_stop;
 
-  //glEnable(GL_CCW);
-  //  glEnable(GL_CULL_FACE);
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_FRONT);
+
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_LIGHTING);
@@ -151,11 +154,11 @@ void draw_scene()
   field_draw(&field);
   // flag
   (*(flag.draw))(&flag);
-
+  
   for (i = 0; i < N_ENEMIES; i++)
     if (enemies[i].draw)
       (*(enemies[i].draw))(&enemies[i]);
-
+  
   glutSwapBuffers();
 }
 
@@ -215,7 +218,9 @@ void on_idle()
   for (i = 0; i < N_ENEMIES; i++)
     object_update_position(&enemies[i]);
 
-  /* detect a collision */
+  /* detect a collision 
+     if the refresh rate is too slow, a collision may go unnoticed
+     because objects may "teleporte" themselves beyond the target */
   if (object_collide(&user, &flag))
     end_game(1);
   else
