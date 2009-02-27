@@ -50,12 +50,6 @@ void flag_init(object_t *f)
     f->x = MIN_X + (FS/2)*MX + 200 + rand()%(int)((FS/2)*MX - 200);
   f->z = - (NEAR + 200 + rand()%(int)(FAR-NEAR-200));
   
-
-  //  f->x = MIN_X + cos(angle) * dist;//(FS/2) * MX;
-  //f->z = -(NEAR + sin(angle) * dist);//50*MZ);
-
-  printf("%f, %f\n", f->x, f->z);
-
   f->draw = &flag_draw;
   f->strategy = &flag_rotate;
 }

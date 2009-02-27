@@ -15,15 +15,9 @@
 
 /* textures */
 #include "textures/grass.h"
-//#include "textures/wall.h"
 
 #define USER_SPEED 10
 
-/* messages */
-/*const char *winner = "You Won!";
-const char *looser = "Game Over!";
-char *msg = NULL;
-*/
 void on_resize(int x, int y);
 void draw_scene();
 void on_key(unsigned char k, int x, int y);
@@ -70,15 +64,15 @@ int main(int argc, char **argv)
     callbacks[i] = NULL;
 
   callbacks['q'] = &quit;
-  callbacks['n'] = &user_left;
-  callbacks['m'] = &user_right;
-  callbacks['k'] = &user_advance;
-  callbacks['l'] = &user_back;
+  callbacks['s'] = &user_left;
+  callbacks['x'] = &user_right;
+  callbacks['a'] = &user_advance;
+  callbacks['z'] = &user_back;
 
-  callbacks_up['n'] = &user_rot_stop;
-  callbacks_up['m'] = &user_rot_stop;
-  callbacks_up['k'] = &user_stop;
-  callbacks_up['l'] = &user_stop;
+  callbacks_up['s'] = &user_rot_stop;
+  callbacks_up['x'] = &user_rot_stop;
+  callbacks_up['a'] = &user_stop;
+  callbacks_up['z'] = &user_stop;
 
   glEnable(GL_CULL_FACE);
   glCullFace(GL_FRONT);
@@ -100,16 +94,7 @@ int main(int argc, char **argv)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-  /*
-  glBindTexture(GL_TEXTURE_2D, WALL_TEX);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, wall_tex.width, wall_tex.height,
-               0, GL_RGB, GL_UNSIGNED_BYTE, wall_tex.pixel_data);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-*/
+
   sun_init(&sun);
   field_init(&field);
 
@@ -142,7 +127,6 @@ void on_resize(int w, int h)
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  //glFrustum(MIN_X, MAX_X, MIN_Y, MAX_Y, NEAR, FAR);
   gluPerspective(45, w/h, NEAR, FAR);
 }
 
@@ -170,16 +154,6 @@ void draw_scene()
     if (enemies[i].draw)
       (*(enemies[i].draw))(&enemies[i]);
 
-  /*  if (msg)
-    {
-      int i;
-      glPushMatrix();
-      glTranslatef(MIN_X + (FS/2) * MX, 0.0, 0.0);
-      for (i = 0; i<strlen(winner); i++)
-        glutStrokeCharacter(GLUT_STROKE_ROMAN, winner[i]);
-      glPopMatrix();
-    }
-  */
   glutSwapBuffers();
 }
 
@@ -218,20 +192,16 @@ void end_game(int winner)
   if (winner)
     {
       /* green light */
-      sun.diffuse[0] = 0.4;
+      sun.diffuse[0] = 0.3;
       sun.diffuse[1] = 1.0;
-      sun.diffuse[2] = 0.4;
-
-      //msg = winner;
+      sun.diffuse[2] = 0.3;
     }
   else
     {
       /* red light */
       sun.diffuse[0] = 1.0;
-      sun.diffuse[1] = 0.4;
-      sun.diffuse[2] = 0.4;
-
-      //      msg = looser;
+      sun.diffuse[1] = 0.3;
+      sun.diffuse[2] = 0.3;
     }
 }
 

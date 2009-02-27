@@ -1,0 +1,21 @@
+Testato sotto GNU/Linux, Debian 4.0
+
+Compilazione:
+
+$ make
+
+Generazione di una nuova mappa:
+
+$ make build_map
+
+Esecuzione:
+
+$ ./escape
+
+Comandi:
+
+- 'q': chiudi il programma
+- 'a': avanza
+- 'z': indietreggia
+- 's': gira a sinistra
+- 'x': gira a destra
