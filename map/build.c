@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #define SZ 1024
-#define MAX_DIFF 2
+#define MAX_DIFF 10
 
 int main(int argc, char **argv)
 {
@@ -34,10 +34,18 @@ int main(int argc, char **argv)
         else
           {
             int sign = rand()%2;
+            unsigned char lat = prev;
+            /*            if (sign == 3) 
+              {
+                res[i][j] = 0;
+                continue;
+                }*/
+            if (i > 0) 
+              lat = res[i-1][j];
             /* more chances to go down */
             if (sign != 1)
               sign = -1;
-            n = prev + sign*rand()%MAX_DIFF;
+            n = (prev+lat)/2 + sign*rand()%MAX_DIFF;
             if (n < 0)
               n = 0;
             if (n > 255)

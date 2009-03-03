@@ -39,7 +39,7 @@ static key_callback_t callbacks_up[UCHAR_MAX];
 static sun_t sun;
 static object_t flag;
 object_t user;
-#define N_ENEMIES 4
+#define N_ENEMIES 1
 static object_t enemies[N_ENEMIES];
 field_t field;
 
@@ -101,7 +101,7 @@ int main(int argc, char **argv)
   flag_init(&flag);
   object_init(&user);
   user.strategy = &user_strategy;
-
+  /*
   GLfloat enemy_conf[N_ENEMIES][3] = {
     { MIN_X + 10*MX, -NEAR,  7 },
     { MAX_X - 10*MX, -NEAR, 6 },
@@ -112,6 +112,9 @@ int main(int argc, char **argv)
   for (i = 0; i < N_ENEMIES; i++)
     object_init_follower(&enemies[i], enemy_conf[i][0], enemy_conf[i][1],
                          enemy_conf[i][2]);
+  */
+
+  object_init_watcher(&enemies[0], 500, -100, 5);
 
   glutMainLoop();
 

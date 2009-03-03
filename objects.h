@@ -49,5 +49,6 @@ void sentinel_strategy(object_t *u, double delta);
 void follow_strategy(object_t *u, double delta);
 
 void object_init_follower(object_t *u, GLfloat x, GLfloat z, GLfloat speed);
+void object_init_watcher(object_t *u, GLfloat x, GLfloat z, GLfloat speed);
 
 #endif /* OBJECTS_H */

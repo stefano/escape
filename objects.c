@@ -164,6 +164,75 @@ void follow_strategy(object_t *u, double delta)
     }
 }
 
+void watcher_strategy(object_t *u, double delta)
+{
+  /* check if user is visible */
+  int view = 1;
+  GLfloat dx = u->x - user.x;
+  GLfloat dz = u->z - user.z;
+  /* +2 for object height */
+  GLfloat dy = field_height(&field, u->x, u->z) - 
+    field_height(&field, user.x, user.z);
+
+  if (dx == 0 && dz == 0)
+    return;
+
+  if (dx != 0) {
+    float mz = dz / dx;
+    float my = dy / dx;
+    float from = dx > 0 ? user.x : u->x;
+    float to = dx > 0 ? u->x : user.x;
+    float x;
+    for (x = from; x < to; x += 0.1) 
+      {
+        float z = mz * x;
+        float y = my * x;
+        if (field_height(&field, x, z) >= y)
+          {
+            view = 0;
+            break;
+          }
+      }
+  }
+  else
+    {
+      /* move along z */
+      float my = dy / dz;
+      float from = dz > 0 ? user.z : u->z;
+      float to = dz > 0 ? u->z : user.z;
+      float z;
+      for (z = from; z < to; z += 0.1) 
+        {
+          float y = my * z;
+          if (field_height(&field, 0, z) >= y)
+            {
+              view = 0;
+              break;
+            }
+        }
+    }
+  if (view)
+    {
+      /* follower */
+      follow_strategy(u, delta);
+    }
+  else
+    {
+      /* move randomly */
+      GLfloat x = rand();
+      GLfloat z = rand();
+      GLfloat len = sqrt(x*x+z*z);
+      if (len > 0) {
+        x /= len;
+        z /= len;
+        GLfloat xmeters = delta * u->sx * x;
+        GLfloat zmeters = delta * u->sx * z;
+        u->x += xmeters * MX;
+        u->z += zmeters * MZ;
+      }
+    }
+}
+
 void draw_sphere(object_t *u)
 {
   GLfloat r = 2;
@@ -180,6 +249,16 @@ void object_init_follower(object_t *u, GLfloat x, GLfloat z, GLfloat speed)
   object_init(u);
   u->draw = &draw_sphere;
   u->strategy = &follow_strategy;
+  u->x = x;
+  u->z = z;
+  u->sx = speed;
+}
+
+void object_init_watcher(object_t *u, GLfloat x, GLfloat z, GLfloat speed)
+{
+  object_init(u);
+  u->draw = &draw_sphere;
+  u->strategy = &watcher_strategy;
   u->x = x;
   u->z = z;
   u->sx = speed;
