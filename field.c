@@ -183,8 +183,20 @@ float field_height(field_t *f, float x, float z)
 {
   int ix, iz;
 
-  ix = x / MX;
-  iz = (-z) / MZ;
+  x /= MX;
+  z /= MZ;
+  z = -z;
+
+  /* round to nearest int */
+
+  ix = x;
+  iz = z;
+
+  if ((x - ix) > 0.5)
+    ix++;
+  if ((z - iz) > 0.5)
+    iz++;
+
   /*
   if (ix == x && iz == -z)
     {
