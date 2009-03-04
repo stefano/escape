@@ -185,37 +185,39 @@ float field_height(field_t *f, float x, float z)
 
   x /= MX;
   z /= MZ;
-  z = -z;
-
-  /* round to nearest int */
+  z = -(z + NEAR);
 
   ix = x;
   iz = z;
-
-  if ((x - ix) > 0.5)
-    ix++;
-  if ((z - iz) > 0.5)
-    iz++;
-
   /*
   if (ix == x && iz == -z)
     {
-      printf("%f\n", field.height[ix][iz]);
       return field.height[ix][iz];
     }
   */
   if (ix >= 0 && ix < FS && iz >= 0 && iz < FS)
-    return field.height[ix][iz]; 
-  /*  
-  float *p1 = f->v[ix][iz];//{ ix, iz, field.height[ix][iz] };
-  float *p2 = f->v[ix+1][iz];//{ ix + 1, iz, field.height[ix+1][iz] };
-  float *p3 = f->v[ix][iz+1];//{ ix, iz + 1, field.height[ix][iz+1] };
-  float n[3];
-  //  printf("%f %f %f\n", p3[0], p3[1], p3[2]);
-  find_normal(p1, p2, p3, n);
-  float h = (-n[0]*(x-p1[0]) - n[3]*(z - p1[2]) + n[2]*p1[1]) / n[1];
-  printf("%f %f %f => %f\n", n[0], n[1], n[2], h);
-  return -h;*/
+    {
+      return field.height[ix][iz]; 
+      /*  
+      float *p1; //{ ix, iz, field.height[ix][iz] };
+      float *p2 = f->v[ix+1][iz];;
+      if (((x - ix) + (z - iz)) < 1) // lower half
+        p1 = f->v[ix][iz];
+      else
+        p1 = f->v[ix+1][iz+1];
+      //{ ix + 1, iz, field.height[ix+1][iz] };
+      //else // upper half
+      //p2 = f->v[
+      float *p3 = f->v[ix][iz+1];//{ ix, iz + 1, field.height[ix][iz+1] };
+      //float n[3];
+      float b2[3] = { p3[0] - p1[0], p3[1] - p1[1], p3[2] - p1[2] };
+      float b1[3] = { p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2] };
+      float h = (x * (b1[1] * b2[2] - b1[2] * b2[1]) + 
+                 z * (b1[0] * b2[1] - b1[1] * b2[0])) / (b1[0] * b2[2] - b1[2] * b2[0]);
+      
+      printf("%f\n", h);
+      return h;*/
+    }
   return 0.0;
 }
 
