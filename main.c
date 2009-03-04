@@ -152,11 +152,11 @@ void draw_scene()
   field_draw(&field);
   // flag
   (*(flag.draw))(&flag);
-  /*  
+  
   for (i = 0; i < N_ENEMIES; i++)
     if (enemies[i].draw)
       (*(enemies[i].draw))(&enemies[i]);
-  */
+
   glutSwapBuffers();
 }
 
@@ -213,9 +213,9 @@ void on_idle()
   int i;
   object_update_position(&user);
   object_update_position(&flag);
-  /*for (i = 0; i < N_ENEMIES; i++)
+  for (i = 0; i < N_ENEMIES; i++)
     object_update_position(&enemies[i]);
-*/
+
   /* detect a collision 
      if the refresh rate is too slow, a collision may go unnoticed
      because objects may "teleporte" themselves beyond the target */

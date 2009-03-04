@@ -111,6 +111,19 @@ void object_move(object_t *u)
   glTranslatef(-u->x, - (h + 1.80) * MY, -u->z);
 }
 
+void block_on_walls(object_t *u)
+{
+  /* block on the walls */
+  if (u->x > MAX_X-MX)
+    u->x = MAX_X-MX;
+  if (u->x < MIN_X+MX)
+    u->x = MIN_X+MX;
+  if (u->z < -FAR+MZ)
+    u->z = -FAR+MZ;
+  if (u->z > -NEAR-MZ)
+    u->z = -NEAR-MZ;
+}
+
 void user_strategy(object_t *u, double delta)
 {
   float sx = u->sx;
@@ -125,15 +138,7 @@ void user_strategy(object_t *u, double delta)
   u->x += xmeters * MX;
   u->z += -zmeters * MZ;
 
-  /* block on the walls */
-  if (u->x > MAX_X-MX)
-    u->x = MAX_X-MX;
-  if (u->x < MIN_X+MX)
-    u->x = MIN_X+MX;
-  if (u->z < -FAR+MZ)
-    u->z = -FAR+MZ;
-  if (u->z > -NEAR-MZ)
-    u->z = -NEAR-MZ;
+  block_on_walls(u);
 }
 
 void sentinel_strategy(object_t *u, double delta)
@@ -170,9 +175,10 @@ void watcher_strategy(object_t *u, double delta)
   int view = 1;
   GLfloat dx = u->x - user.x;
   GLfloat dz = u->z - user.z;
-  /* +2 for object height */
-  GLfloat dy = field_height(&field, u->x, u->z) - 
-    field_height(&field, user.x, user.z);
+  GLfloat user_h = field_height(&field, user.x, user.z) + 1.8;
+  /* +4 for object height */
+  GLfloat u_h =  4 + field_height(&field, u->x, u->z);
+  GLfloat dy = u_h - user_h;
 
   if (dx == 0 && dz == 0)
     return;
@@ -180,14 +186,28 @@ void watcher_strategy(object_t *u, double delta)
   if (dx != 0) {
     float mz = dz / dx;
     float my = dy / dx;
-    float from = dx > 0 ? user.x : u->x;
-    float to = dx > 0 ? u->x : user.x;
-    float x;
-    for (x = from; x < to; x += 0.1) 
+    float x0, z0, y0;
+    if (dx > 0) 
       {
-        float z = mz * x;
-        float y = my * x;
-        if (field_height(&field, x, z) >= y)
+        x0 = user.x;
+        z0 = user.z;
+        y0 = user_h;
+      }
+    else
+      {
+        x0 = u->x;
+        z0 = u->z;
+        y0 = u_h;
+      }
+    float x;
+    float end = abs(dx);
+    /* check if the field crosses the view line */
+    for (x = 0.0; x < end; x += 0.1) 
+      {
+        float z = mz * x + z0;
+        float the_x = x + x0;
+        float y = my * x + y0;
+        if (field_height(&field, the_x, z) >= y)
           {
             view = 0;
             break;
@@ -196,15 +216,26 @@ void watcher_strategy(object_t *u, double delta)
   }
   else
     {
-      /* move along z */
+      /* unlikely to happen: view line along z */
       float my = dy / dz;
-      float from = dz > 0 ? user.z : u->z;
-      float to = dz > 0 ? u->z : user.z;
-      float z;
-      for (z = from; z < to; z += 0.1) 
+      float z0, y0;
+      if (dz > 0) 
         {
-          float y = my * z;
-          if (field_height(&field, 0, z) >= y)
+          z0 = user.z;
+          y0 = user_h;
+        }
+      else
+        {
+          z0 = u->z;
+          y0 = u_h;
+        }
+      float end = -abs(z0);
+      float z;
+      for (z = 0.0; z > end; z -= 0.1)
+        {
+          float y = my * z + y0;
+          float the_z = z + z0;
+          if (field_height(&field, 0, the_z) >= y)
             {
               view = 0;
               break;
@@ -229,6 +260,7 @@ void watcher_strategy(object_t *u, double delta)
         GLfloat zmeters = delta * u->sx * z;
         u->x += xmeters * MX;
         u->z += zmeters * MZ;
+        block_on_walls(u);
       }
     }
 }
