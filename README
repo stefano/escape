@@ -11,6 +11,7 @@ $ make build_map
 Esecuzione:
 
 $ ./escape
+(l'avvio e' un po' lento)
 
 Comandi:
 
@@ -19,3 +20,11 @@ Comandi:
 - 'z': indietreggia
 - 's': gira a sinistra
 - 'x': gira a destra
+
+La bandiera da raggiungere e' un triangolo rosso rotante dentro ad una sfera 
+semitrasparente. La bandiera e' posizionata in modo casuale, ma sempre ad una 
+distanza minima dal giocatore.
+
+Ci sono due tipi di nemici:
+  1) Le sfere rosse inseguono il giocatore solo se la linea di vista e' libera.
+  2) Le sfere blu inseguono il giocatore sempre e comunque.
