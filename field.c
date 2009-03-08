@@ -47,6 +47,8 @@ void vec_avg(float **v, size_t n, float *res)
     res[j] /= n;
 }
 
+void field_compile_draw(field_t *f);
+
 void field_init(field_t *f)
 {
   FILE *map = fopen("field.map", "r");
@@ -119,18 +121,21 @@ void field_init(field_t *f)
           }
       }
   free(norms);
+
+  f->field_display_list = glGenLists(128);
+  field_compile_draw(f);
 }
 
-void field_draw(field_t *f)
+void field_compile_draw(field_t *f)
 {
   int i,j;
 
+  glNewList(f->field_display_list, GL_COMPILE);
   glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, FIELD_TEX);
   
   glColor3f(1.0, 1.0, 1.0);
   glBegin(GL_QUADS);
-
   for (i = 0; i < FS-1; i++)
     for (j = 0; j < FS-1; j++) 
       {
@@ -176,7 +181,13 @@ void field_draw(field_t *f)
   glVertex3f(MIN_X, MIN_Y, -NEAR);
   glVertex3f(MIN_X, MAX_Y, -NEAR);
  
-  glEnd();
+  glEnd(); 
+  glEndList();
+}
+
+void field_draw(field_t *f)
+{
+  glCallList(f->field_display_list);
 }
 
 float field_height(field_t *f, float x, float z)

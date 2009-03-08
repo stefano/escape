@@ -12,6 +12,7 @@ typedef struct _field_t
   float normals[FS][FS][3];
   /* pre-computed vertexes */
   float v[FS][FS][3];
+  unsigned int field_display_list;
 } field_t;
 
 void field_init(field_t *f);
