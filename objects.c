@@ -12,7 +12,7 @@ void flag_draw(object_t *f)
   double r = 3;
   double h = MIN_Y + field_height(&field, f->x, f->z) + MY; // floating
   glPushMatrix();
-  glColor3f(1.0, 0.0, 0.0);
+  glColor3ub(255, 0, 0);
   glTranslatef(f->x, h, f->z);
   glScalef(r*MX, r*MY, r*MZ);
   glRotatef(f->angle, 0.0, 1.0, 0.0);
@@ -26,7 +26,7 @@ void flag_draw(object_t *f)
   glVertex2f(0.0, 1.0); 
   glVertex2f(-0.5, 0.0);
   glEnd();
-  glColor4f(0.0, 1.0, 0.0, 0.6);
+  glColor4ub(217, 225, 12, 200);
   glutSolidSphere(1, 42, 42);
   glPopMatrix();
 }
@@ -43,13 +43,13 @@ void flag_init(object_t *f)
   srand(glutGet(GLUT_ELAPSED_TIME));
 
   object_init(f);
-
+  
   if (rand()%2 == 0) /* left */
     f->x = MIN_X + rand()%(int)((FS/2)*MX - 200);
   else /* right */
     f->x = MIN_X + (FS/2)*MX + 200 + rand()%(int)((FS/2)*MX - 200);
   f->z = - (NEAR + 200 + rand()%(int)(FAR-NEAR-200));
-  
+
   f->draw = &flag_draw;
   f->strategy = &flag_rotate;
 }
@@ -276,6 +276,17 @@ void draw_sphere(object_t *u)
   glPopMatrix();
 }
 
+void draw_watcher(object_t *u)
+{
+  GLfloat r = 2;
+  glPushMatrix();
+  glColor3f(1.0, 0.0, 0.0);
+  glTranslatef(u->x, MIN_Y + r * MY + field_height(&field, u->x, u->z), u->z);
+  glScalef(r * MX, r * MY, r * MZ);
+  glutSolidSphere(1, 42, 42);
+  glPopMatrix();
+}
+
 void object_init_follower(object_t *u, GLfloat x, GLfloat z, GLfloat speed)
 {
   object_init(u);
@@ -289,7 +300,7 @@ void object_init_follower(object_t *u, GLfloat x, GLfloat z, GLfloat speed)
 void object_init_watcher(object_t *u, GLfloat x, GLfloat z, GLfloat speed)
 {
   object_init(u);
-  u->draw = &draw_sphere;
+  u->draw = &draw_watcher;
   u->strategy = &watcher_strategy;
   u->x = x;
   u->z = z;

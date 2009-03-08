@@ -16,7 +16,7 @@
 /* textures */
 #include "textures/grass.h"
 
-#define USER_SPEED 10
+#define USER_SPEED 12
 
 void on_resize(int x, int y);
 void draw_scene();
@@ -39,7 +39,7 @@ static key_callback_t callbacks_up[UCHAR_MAX];
 static sun_t sun;
 static object_t flag;
 object_t user;
-#define N_ENEMIES 1
+#define N_ENEMIES 12
 static object_t enemies[N_ENEMIES];
 field_t field;
 
@@ -101,19 +101,30 @@ int main(int argc, char **argv)
   flag_init(&flag);
   object_init(&user);
   user.strategy = &user_strategy;
-  /*
+  
   GLfloat enemy_conf[N_ENEMIES][3] = {
-    { MIN_X + 10*MX, -NEAR,  7 },
-    { MAX_X - 10*MX, -NEAR, 6 },
-    { MIN_X + (FS/2)*MX, -FAR, 5 },
-    { MIN_X, -FAR, 5 }
+    { MIN_X + 10*MX, -NEAR,  USER_SPEED/2 },
+    { MAX_X - 10*MX, -NEAR, USER_SPEED/2 },
+    { MIN_X + 10*MX, -FAR, USER_SPEED/2 },
+    { MAX_X - 10*MX, -FAR, USER_SPEED/2 },
+    { MIN_X + 10*MX, -(NEAR+(FS/2)*MZ), USER_SPEED/2 },
+    { MAX_X - 10*MX,  -(NEAR+(FS/2)*MZ), USER_SPEED/2 },
+    { MIN_X + (FS/4)*MX, -(NEAR+(FS/4)*MZ), USER_SPEED/2 },
+    { MIN_X + (FS/4)*MX, -(FAR-(FS/4)*MZ), USER_SPEED/2 },
+    { MAX_X - (FS/4)*MX, -(NEAR+(FS/4)*MZ), USER_SPEED/2 },
+    { MAX_X - (FS/4)*MX, -(FAR-(FS/4)*MZ), USER_SPEED/2 },
+    { MAX_X - (FS/2)*MX, -(NEAR+(FS/2)*MZ), USER_SPEED/2 },
+    { MAX_X - (FS/2)*MX, -(FAR-(FS/4)*MZ), USER_SPEED/2 }
   };
 
-  for (i = 0; i < N_ENEMIES; i++)
+  for (i = 0; i < N_ENEMIES/3; i++)
     object_init_follower(&enemies[i], enemy_conf[i][0], enemy_conf[i][1],
                          enemy_conf[i][2]);
-  */
-
+  
+  for (i = N_ENEMIES/3+1; i < N_ENEMIES; i++)
+    object_init_watcher(&enemies[i], enemy_conf[i][0], enemy_conf[i][1],
+                        enemy_conf[i][2]);
+  
   object_init_watcher(&enemies[0], 500, -100, 5);
 
   glutMainLoop();
