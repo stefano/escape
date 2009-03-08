@@ -58,7 +58,7 @@ void object_init(object_t *u)
 {
   u->angle = 0.0;
   u->x = MIN_X + (FS/2)*MX;
-  u->z = -NEAR;
+  u->z = -(NEAR + 3*MZ);
   u->sx = u->sz = u->rot_speed = 0.0;
   u->old_time = 0;
   u->draw = NULL;
@@ -113,15 +113,15 @@ void object_move(object_t *u)
 
 void block_on_walls(object_t *u)
 {
-  /* block on the walls */
+  /* block near the walls */
   if (u->x > MAX_X-MX)
-    u->x = MAX_X-MX;
+    u->x = MAX_X-3*MX;
   if (u->x < MIN_X+MX)
-    u->x = MIN_X+MX;
-  if (u->z < -FAR+MZ)
+    u->x = MIN_X+3*MX;
+  if (u->z < -FAR+3*MZ)
     u->z = -FAR+MZ;
-  if (u->z > -NEAR-MZ)
-    u->z = -NEAR-MZ;
+  if (u->z > -NEAR-3*MZ)
+    u->z = -NEAR-3*MZ;
 }
 
 void user_strategy(object_t *u, double delta)
