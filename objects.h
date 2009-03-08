@@ -21,11 +21,6 @@ typedef struct _object_t
 
   object_draw_t draw;
   move_strategy_t strategy; /* how will this object move? */
-
-  /* for the sentinel strategy */
-  GLfloat origin_x;
-  GLfloat origin_z;
-  GLfloat max_dist; /* max distance from the user */
 } object_t;
 
 extern object_t user; /* main.c */
@@ -43,8 +38,6 @@ void flag_init(object_t *f);
 
 /* strategies */
 void user_strategy(object_t *u, double delta);
-/* walk around, if the user is near try to catch it */
-void sentinel_strategy(object_t *u, double delta);
 /* just go after the user */
 void follow_strategy(object_t *u, double delta);
 

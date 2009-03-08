@@ -77,7 +77,7 @@ int main(int argc, char **argv)
   glEnable(GL_CULL_FACE);
   glCullFace(GL_FRONT);
 
-  glEnable(GL_BLEND);
+  glEnable(GL_BLEND); /* for the sphere sorrounding the flag */
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   glEnable(GL_DEPTH_TEST);
@@ -88,6 +88,7 @@ int main(int argc, char **argv)
   glLightModelfv(GL_LIGHT_MODEL_AMBIENT, black);
   glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 0);
 
+  /* preload the field texture */
   glBindTexture(GL_TEXTURE_2D, FIELD_TEX);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, gimp_image.width, gimp_image.height,
                0, GL_RGB, GL_UNSIGNED_BYTE, gimp_image.pixel_data);
@@ -95,13 +96,15 @@ int main(int argc, char **argv)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
+  /* sun, field & objects initalizations */
   sun_init(&sun);
   field_init(&field);
 
   flag_init(&flag);
   object_init(&user);
   user.strategy = &user_strategy;
-  
+
+  /* initialize enemies positions & speeds */
   GLfloat enemy_conf[N_ENEMIES][3] = {
     { MIN_X + 10*MX, -NEAR,  USER_SPEED/2 },
     { MAX_X - 10*MX, -NEAR, USER_SPEED/2 },
@@ -117,16 +120,15 @@ int main(int argc, char **argv)
     { MAX_X - (FS/2)*MX, -(FAR-(FS/4)*MZ), USER_SPEED/2 }
   };
 
+  /* 1/3 followers, 2/3 watchers */
   for (i = 0; i < N_ENEMIES/3; i++)
     object_init_follower(&enemies[i], enemy_conf[i][0], enemy_conf[i][1],
                          enemy_conf[i][2]);
-  
   for (i = N_ENEMIES/3+1; i < N_ENEMIES; i++)
     object_init_watcher(&enemies[i], enemy_conf[i][0], enemy_conf[i][1],
                         enemy_conf[i][2]);
   
-  object_init_watcher(&enemies[0], 500, -100, 5);
-
+  /* start */
   glutMainLoop();
 
   return 0;
@@ -138,7 +140,6 @@ void on_resize(int w, int h)
     h = 1; /* avoid division by 0 */
 
   glViewport(0, 0, w, h);
-
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   gluPerspective(45, w/h, NEAR, FAR);
@@ -205,14 +206,14 @@ void end_game(int winner)
       callbacks[i] = NULL;
   if (winner)
     {
-      /* green light */
+      /* green ambient */
       sun.diffuse[0] = 0.3;
       sun.diffuse[1] = 1.0;
       sun.diffuse[2] = 0.3;
     }
   else
     {
-      /* red light */
+      /* red ambient */
       sun.diffuse[0] = 1.0;
       sun.diffuse[1] = 0.3;
       sun.diffuse[2] = 0.3;
@@ -228,8 +229,8 @@ void on_idle()
     object_update_position(&enemies[i]);
 
   /* detect a collision 
-     if the refresh rate is too slow, a collision may go unnoticed
-     because objects may "teleporte" themselves beyond the target */
+     if the refresh is too slow, a collision may go unnoticed
+     because objects may warp beyond the target */
   if (object_collide(&user, &flag))
     end_game(1);
   else

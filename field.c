@@ -200,6 +200,13 @@ float field_height(field_t *f, float x, float z)
 
   ix = x;
   iz = z;
+
+  /* round to nearest */
+  if ((x - ix) > 0.5)
+    ix++;
+  if ((z - iz) > 0.5)
+    iz++;
+  
   /*
   if (ix == x && iz == -z)
     {

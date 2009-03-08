@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define SZ 1024
 #define MAX_DIFF 10
@@ -14,6 +15,8 @@ int main(int argc, char **argv)
   FILE *f = fopen(argv[1], "w");
   int i,j;
   unsigned char res[SZ][SZ];
+  time_t t;
+  srand(time(&t));
   for (i = 0; i < SZ; i++)
     for (j = 0; j < SZ; j++)
       {

@@ -119,7 +119,7 @@ void block_on_walls(object_t *u)
   if (u->x < MIN_X+MX)
     u->x = MIN_X+3*MX;
   if (u->z < -FAR+3*MZ)
-    u->z = -FAR+MZ;
+    u->z = -FAR+3*MZ;
   if (u->z > -NEAR-3*MZ)
     u->z = -NEAR-3*MZ;
 }
@@ -128,10 +128,11 @@ void user_strategy(object_t *u, double delta)
 {
   float sx = u->sx;
   float sz = u->sz;
- //  field_inclination(&field, u->x, u->z, &sx, &sz);
 
+  /* advance along x & z depending on the speed */
   GLfloat xmeters = delta * sx;
   GLfloat zmeters = delta * sz;
+  /* rotation movement depends on rotation speed */
   GLfloat rad = delta * u->rot_speed; 
 
   u->angle += rad;
@@ -146,6 +147,9 @@ void sentinel_strategy(object_t *u, double delta)
   
 }
 
+/*
+ * Always go toward the user
+ */
 void follow_strategy(object_t *u, double delta)
 {
   /* distance vector */
@@ -160,7 +164,6 @@ void follow_strategy(object_t *u, double delta)
       z /= len;
 
       /* sx is treated as the speed tangent to the distance vector */
-    
       GLfloat xmeters = delta * u->sx * x;
       GLfloat zmeters = delta * u->sx * z;
 
@@ -169,6 +172,9 @@ void follow_strategy(object_t *u, double delta)
     }
 }
 
+/*
+ * Follow the user only if the view line is free
+ */
 void watcher_strategy(object_t *u, double delta)
 {
   /* check if user is visible */
@@ -180,7 +186,7 @@ void watcher_strategy(object_t *u, double delta)
   GLfloat u_h =  4 + field_height(&field, u->x, u->z);
   GLfloat dy = u_h - user_h;
 
-  if (dx == 0 && dz == 0)
+  if (dx == 0 && dz == 0) /* already reached */
     return;
 
   if (dx != 0) {
@@ -267,6 +273,7 @@ void watcher_strategy(object_t *u, double delta)
 
 void draw_sphere(object_t *u)
 {
+  /* 4 meters high */
   GLfloat r = 2;
   glPushMatrix();
   glColor3f(0.0, 0.0, 1.0);
@@ -278,6 +285,7 @@ void draw_sphere(object_t *u)
 
 void draw_watcher(object_t *u)
 {
+  /* like draw_sphere, but red */
   GLfloat r = 2;
   glPushMatrix();
   glColor3f(1.0, 0.0, 0.0);

@@ -3,7 +3,6 @@
 
 #define FS 1024
 #define FIELD_TEX 1
-//#define WALL_TEX 2
 
 typedef struct _field_t
 {
