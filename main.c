@@ -142,7 +142,8 @@ void on_resize(int w, int h)
   glViewport(0, 0, w, h);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluPerspective(45, w/h, NEAR, FAR);
+  /* it's possible to see the whole field */
+  gluPerspective(45, w/h, 0.01, FAR);
 }
 
 void draw_scene()
