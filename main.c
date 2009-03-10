@@ -143,7 +143,7 @@ void on_resize(int w, int h)
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   /* it's possible to see the whole field */
-  gluPerspective(45, w/h, 0.01, FAR);
+  gluPerspective(45, (GLfloat)w/(GLfloat)h, 0.01, FAR);
 }
 
 void draw_scene()
